@@ -54,6 +54,15 @@ CREATE TABLE INTEGRATED_ACCOUNT (
     -- [제약] 로그인 ID는 중복될 수 없음
                                     CONSTRAINT UK_ACCOUNT_LOGIN_ID UNIQUE (LOGIN_ID)
 );
+create sequence SEQ_INTEGRATED_ACCOUNT
+    START WITH 1
+    increment by 1
+    MAXVALUE 999999
+    MINVALUE 1
+    CYCLE
+    NOCACHE;
+INSERT INTO INTEGRATED_ACCOUNT VALUES (seq_integrated_account.nextval, 'testG', '1111', 'G', sysdate, sysdate);
+INSERT INTO INTEGRATED_ACCOUNT VALUES (seq_integrated_account.nextval, 'testD', '2222', 'D', sysdate, sysdate);
 
 -- 3. 자식 테이블: MEDICAL_STAFF (의료진 인사 정보)
 CREATE TABLE MEDICAL_STAFF (
