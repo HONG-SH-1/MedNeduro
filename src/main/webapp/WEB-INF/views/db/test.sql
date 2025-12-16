@@ -1,1 +1,1 @@
-SELECT * FROM
+'pass1234', 'DOCTOR', '피부과', '2023-01-10');

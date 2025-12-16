@@ -67,7 +67,7 @@ INSERT INTO INTEGRATED_ACCOUNT VALUES (seq_integrated_account.nextval, 'testD', 
 -- 3. 자식 테이블: MEDICAL_STAFF (의료진 인사 정보)
 CREATE TABLE MEDICAL_STAFF (
                              STAFF_ID     VARCHAR2(20)   NOT NULL,
-                             ACCOUNT_ID   NUMBER         NOT NULL,
+                             ACCOUNT_ID   NUMBER,
                              DEPT_ID    VARCHAR2(10)   NOT NULL,
                              STAFF_NAME   VARCHAR2(50)   NOT NULL,
   -- [보안] 암호화된 텍스트 저장을 위해 길이 확장 (20 -> 200)
@@ -90,7 +90,7 @@ CREATE TABLE MEDICAL_STAFF (
 -- 4. 자식 테이블: PATIENT (환자 상세 정보)
 CREATE TABLE PATIENT (
                          PATIENT_ID     VARCHAR2(20)   NOT NULL,
-                         ACCOUNT_ID     NUMBER         NOT NULL,
+                         ACCOUNT_ID     NUMBER,
                          PATIENT_NAME   VARCHAR2(50)   NOT NULL,
     -- [보안] 암호화된 텍스트 저장을 위해 길이 확장
                          EMAIL          VARCHAR2(200),
@@ -175,4 +175,11 @@ CREATE TABLE TUMOR_ANNOTATION (
                                   CONSTRAINT FK_ANNOT_WRITER FOREIGN KEY (WRITER_ACCOUNT_ID)
                                       REFERENCES INTEGRATED_ACCOUNT(ACCOUNT_ID)
 );
+/*
+- 수정 완료
+ALTER TABLE MEDICAL_STAFF MODIFY(ACCOUNT_ID NUMBER NULL);
+ALTER TABLE PATIENT MODIFY(ACCOUNT_ID NUMBER NULL);
+ALTER TABLE PATIENT MODIFY (SSN VARCHAR2(500));
+*/
+
 
