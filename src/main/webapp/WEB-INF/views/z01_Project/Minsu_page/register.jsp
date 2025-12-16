@@ -13,7 +13,6 @@
     <title>MadNeduro - 회원가입</title>
     <link rel="stylesheet" href="/com/bootstrap.min.css">
     <style>
-        /* 기존 스타일 유지 */
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Noto Sans KR', sans-serif; }
         ::-webkit-scrollbar { display: none; }
         #main {
@@ -50,15 +49,17 @@
     <script src="/com/bootstrap.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
+            var isIdChecked = false;
+            $("input[name='id']").on("input",function(){
+                isIdChecked = false;
+            })
 
-            // ★ 주민번호 앞자리 입력 시 뒷자리로 자동 이동
+
             $("input[name='rrn_front']").keyup(function(){
                 if($(this).val().length >= 6) {
                     $("input[name='rrn_back']").focus();
                 }
             });
-
-            // ★ 전화번호 자동 하이픈 (-) 추가
             $("input[name='phoneNumber']").keyup(function(){
                 var val = $(this).val().replace(/[^0-9]/g, ''); // 숫자만 남기기
                 if(val.length > 3 && val.length < 8){
@@ -70,21 +71,23 @@
             });
 
             $("#regBtn").click(function(){
-                // 값 가져오기
                 var id = $("input[name='id']").val();
                 var pwd = $("input[name='pwd']").val();
                 var pwd2 = $("#pwd2").val();
                 var name = $("input[name='name']").val();
-
-                // 주민번호 합치기
                 var rrn_front = $("input[name='rrn_front']").val();
                 var rrn_back = $("input[name='rrn_back']").val();
-                var full_rrn = rrn_front + "-" + rrn_back; // 나중에 DB 보낼 땐 합쳐서 보내거나 따로 보내거나 설계에 따름
-
+                var full_rrn = rrn_front + "-" + rrn_back;
                 var phoneNumber = $("input[name='phoneNumber']").val();
                 var isAgreed = $("#agreeCheck").is(":checked");
 
-                // 유효성 검사
+                if(isIdChecked == false){
+                    alert("아이디를 중복확인을 해주세요!");
+                    $("#checkBtn").focus();
+                    return;
+                }
+
+
                 if(id == "") { alert("아이디를 입력해주세요."); $("input[name='id']").focus(); return; }
                 if(pwd == "") { alert("비밀번호를 입력해주세요."); $("input[name='pwd']").focus(); return; }
                 if(pwd != pwd2) { alert("비밀번호가 일치하지 않습니다."); $("#pwd2").focus(); return; }
@@ -101,8 +104,6 @@
                 if(!isAgreed) { alert("개인정보 수집 및 이용에 동의해주세요."); $("#agreeCheck").focus(); return; }
 
                 if(confirm("가입하시겠습니까?")){
-                    // 주민번호 합쳐서 hidden 필드에 넣거나, Controller에서 받아서 처리
-                    // 여기서는 편의상 form 안에 hidden input을 만들어서 합친 값을 넣어줍니다.
                     $("#final_rrn").val(full_rrn);
                     $("form").submit();
                 }
@@ -110,6 +111,37 @@
 
             $("#cancelBtn").click(function(){
                 location.href = "${path}/loginpage";
+            });
+            var msg = "${msg}";
+            if(msg != ""){alert(msg);}
+
+            $("#checkBtn").click(function(){
+               var id = $("input[name='id']").val();
+               if(id == ""){
+                   alert("아이디를 입력해주세요.")
+                   $("input[name='id']").focus();
+                   return;
+               }
+               $.ajax({
+                   type : "get",
+                   url : "${path}/checkId",
+                   data : "id="+ id,
+                   dataType : "text",
+                   success : function(data){
+                       alert(data);
+                       if(data.includes("사용 가능")){
+                           isIdChecked = true;
+                       } else {
+                           isIdChecked = false;
+                           $("input[name='id']").val("");
+                           $("input[name='id']").focus();
+                       }
+                   },
+                   error : function(err){
+                     console.log(err);
+                   }
+                   }
+               )
             });
         });
     </script>
@@ -138,7 +170,7 @@
                 <label class="form-label">아이디</label>
                 <div class="input-group">
                     <input type="text" name="id" class="form-control" placeholder="아이디 입력">
-                    <button type="button" class="btn btn-secondary">중복확인</button>
+                    <button type="button" id="checkBtn" class="btn btn-secondary">중복확인</button>
                 </div>
             </div>
 
@@ -159,10 +191,10 @@
 
             <div class="mb-3">
                 <label class="form-label">주민등록번호</label>
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap : 50px">
                     <input type="text" name="rrn_front" class="form-control text-center" maxlength="6" placeholder="생년월일(6자리)">
-                    <span class="text-white">-</span>
-                    <input type="password" name="rrn_back" class="form-control text-center" maxlength="7" placeholder="뒤 7자리">
+                    <span class="text-white mx-2" >─</span>
+                    <input type="text" name="rrn_back" class="form-control text-center" maxlength=1" placeholder="주민번호 뒷번호 1자리">
                 </div>
             </div>
 

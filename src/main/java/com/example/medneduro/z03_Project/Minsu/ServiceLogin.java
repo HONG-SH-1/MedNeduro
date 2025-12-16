@@ -1,11 +1,13 @@
-package com.example.medneduro.z03_Project;
+package com.example.medneduro.z03_Project.Minsu;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Transactional
 @Service
 public class ServiceLogin {
     @Autowired(required = false)
@@ -25,5 +27,28 @@ public class ServiceLogin {
         map1.put("USER_TYPE",dbType);
         return dao.logincheck(map1) > 0;
     }
+
+    public int registerProc(Register reg) {
+        if(dao.checkId(reg.getId()) > 0){
+            return 0;
+        }
+        if(dao.checkId(reg.getId()) == 0){
+            String userType = reg.getUserType();
+            if("general".equals(userType)){
+               reg.setUserType("G");
+            }
+            if("doctor".equals(userType)){
+                reg.setUserType("D");
+            }
+            return dao.registerProc(reg);
+        }
+        return dao.registerProc(reg);
+
+    }
+
+    public int checkId(String id){
+        return dao.checkId(id);
+    }
+
 
 }
