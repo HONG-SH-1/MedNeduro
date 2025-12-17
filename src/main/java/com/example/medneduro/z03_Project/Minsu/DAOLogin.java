@@ -12,8 +12,8 @@ public interface DAOLogin {
     int logincheck(Map<String, String> map);
 
     @Insert("Insert INTO INTEGRATED_ACCOUNT " +
-            "(ACCOUNT_ID,LOGIN_ID, PASSWORD, NAME,RRN,PHONE,USER_TYPE,LAST_LOGIN_DATE,JOIN_DATE)" +
-            "VALUES(SEQ_INTEGRATED_ACCOUNT.NEXTVAL,#{id},#{pwd},#{name},#{id_card},#{phoneNumber},#{userType},NULL,SYSDATE)")
+            "(ACCOUNT_ID,LOGIN_ID, PASSWORD, NAME,birthDate,gender,PHONE,USER_TYPE,LAST_LOGIN_DATE,JOIN_DATE)" +
+            "VALUES(SEQ_INTEGRATED_ACCOUNT.NEXTVAL,#{id},#{pwd},#{name},#{birthDate},#{gender},#{phoneNumber},#{userType},NULL,SYSDATE)")
     int registerProc(Register reg);
 
     @Select("Select count(*) from INTEGRATED_ACCOUNT where UPPER(LOGIN_ID) = UPPER(#{id})")

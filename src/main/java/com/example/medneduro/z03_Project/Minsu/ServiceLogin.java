@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +41,13 @@ public class ServiceLogin {
             if("doctor".equals(userType)){
                 reg.setUserType("D");
             }
-            return dao.registerProc(reg);
+            String gender = reg.getGender();
+            if("1".equals(gender) || "3".equals(gender)){
+                reg.setGender("M");
+            }
+            if("2".equals(gender) || "4".equals(gender)){
+                reg.setGender("W");
+            }
         }
         return dao.registerProc(reg);
 

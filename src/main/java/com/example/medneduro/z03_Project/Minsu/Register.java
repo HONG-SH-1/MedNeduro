@@ -1,15 +1,27 @@
 package com.example.medneduro.z03_Project.Minsu;
 
+import java.util.Date;
+
 public class Register {
     private String id;
     private String pwd;
     private String name;
-    private String id_card;
+    private Date brithDate;
+    private String gender;
     private String phoneNumber;
     private String userType;
 
     public Register(){
 
+    }
+    public Register(String id, String pwd, String name, Date brithDate, String gender, String phoneNumber, String userType) {
+        this.id = id;
+        this.pwd = pwd;
+        this.name = name;
+        this.brithDate = brithDate;
+        this.gender = gender;
+        this.phoneNumber = phoneNumber;
+        this.userType = userType;
     }
 
     public String getId() {
@@ -36,12 +48,20 @@ public class Register {
         this.name = name;
     }
 
-    public String getId_card() {
-        return id_card;
+    public Date getBrithDate() {
+        return brithDate;
     }
 
-    public void setId_card(String id_card) {
-        this.id_card = id_card;
+    public void setBrithDate(Date brithDate) {
+        this.brithDate = brithDate;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getPhoneNumber() {

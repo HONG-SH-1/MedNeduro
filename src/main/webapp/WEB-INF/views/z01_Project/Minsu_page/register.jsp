@@ -55,9 +55,9 @@
             })
 
 
-            $("input[name='rrn_front']").keyup(function(){
+            $("input[name='birthDate']").keyup(function(){
                 if($(this).val().length >= 6) {
-                    $("input[name='rrn_back']").focus();
+                    $("input[name='gender']").focus();
                 }
             });
             $("input[name='phoneNumber']").keyup(function(){
@@ -75,9 +75,8 @@
                 var pwd = $("input[name='pwd']").val();
                 var pwd2 = $("#pwd2").val();
                 var name = $("input[name='name']").val();
-                var rrn_front = $("input[name='rrn_front']").val();
-                var rrn_back = $("input[name='rrn_back']").val();
-                var full_rrn = rrn_front + "-" + rrn_back;
+                var birthDate = $("input[name='birthDate']").val();
+                var gender = $("input[name='gender']").val();
                 var phoneNumber = $("input[name='phoneNumber']").val();
                 var isAgreed = $("#agreeCheck").is(":checked");
 
@@ -94,9 +93,9 @@
                 if(name == "") { alert("이름을 입력해주세요."); $("input[name='name']").focus(); return; }
 
                 // 주민번호 검사
-                if(rrn_front.length != 6 || rrn_back.length != 7) {
+                if(birthDate.length != 6 || gender.length != 1) {
                     alert("주민등록번호를 올바르게 입력해주세요.");
-                    $("input[name='rrn_front']").focus();
+                    $("input[name='birthDate']").focus();
                     return;
                 }
 
@@ -154,8 +153,6 @@
         <h2 class="text-center fw-bold mb-4">회원가입</h2>
 
         <form action="${path}/registerProc" method="post">
-            <input type="hidden" name="id_card" id="final_rrn">
-
             <div class="mb-3 text-center">
                 <div class="user-type-selector">
                     <input type="radio" name="userType" id="type_gen" value="general" checked>
@@ -192,9 +189,9 @@
             <div class="mb-3">
                 <label class="form-label">주민등록번호</label>
                 <div class="d-flex align-items-center gap : 50px">
-                    <input type="text" name="rrn_front" class="form-control text-center" maxlength="6" placeholder="생년월일(6자리)">
+                    <input type="text" name="birthDate" class="form-control text-center" maxlength="6" placeholder="생년월일(6자리)">
                     <span class="text-white mx-2" >─</span>
-                    <input type="text" name="rrn_back" class="form-control text-center" maxlength=1" placeholder="주민번호 뒷번호 1자리">
+                    <input type="text" name="gender" class="form-control text-center" maxlength=1" placeholder="주민번호 뒷번호 1자리">
                 </div>
             </div>
 
