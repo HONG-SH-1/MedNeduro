@@ -70,6 +70,7 @@ public class ControllerLogin {
             d.addFlashAttribute("msg", "이미 사용 중인 아이디입니다.");
             return "redirect:/registerPage";
         }
+        // 동일 인물 데이터 유효성 검사 수정 전
         else if(result.equals("PATIENT_NOT_FOUND")) {
             d.addFlashAttribute("msg", "일치하는 환자 정보가 없습니다. 병원 원무과에 문의해주세요.");
             return "redirect:/registerPage";

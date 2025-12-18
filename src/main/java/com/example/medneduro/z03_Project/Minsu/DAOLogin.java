@@ -23,8 +23,8 @@ public interface DAOLogin {
     int insertAccount(Register reg);
 
     // ================= [환자 (G) 매칭: 이름+폰+생일+성별] =================
-    @Select("SELECT NVL(ACCOUNT_ID, 0) FROM PATIENT " +
-            "WHERE PATIENT_NAME = #{name} " +
+    @Select("SELECT NVL(ACCOUNT_ID, 0) FROM GENERAL " +
+            "WHERE GENERAL_NAME = #{name} " +
             "AND PHONE_NUMBER = #{phoneNumber} " +
             "AND BIRTH_DATE = #{birthDate} " +
             "AND GENDER = #{gender}")
@@ -36,6 +36,13 @@ public interface DAOLogin {
             "AND BIRTH_DATE = #{birthDate} " +
             "AND GENDER = #{gender}")
     int linkPatientAccount(Register reg);
+
+    @Update("UPDATE PATIENT SET ACCOUNT_ID = #{accountId} " +
+            "WHERE PATIENT_NAME = #{name} " +
+            "AND PHONE_NUMBER = #{phoneNumber} " +
+            "AND BIRTH_DATE = #{birthDate} " +
+            "AND GENDER = #{gender}")
+    int linkGeneralAccount(Register reg);
 
     // ================= [의료진 (D) 매칭: 이름+면허번호+부서코드] =================
     // ★ 수정됨: 전화번호 대신 면허번호(Unique)와 부서코드로 정확하게 찾습니다.
