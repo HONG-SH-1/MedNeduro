@@ -17,12 +17,12 @@
         ::-webkit-scrollbar { display: none; }
         #main {
             width : 100%; min-height : 100vh;
-            background-image: url("/images/req1.png");
+            background-image: url("/images/req2.png");
             background-size: cover; background-repeat: no-repeat; background-position: center;
             display: flex; justify-content: center; align-items: center; padding: 50px 0;
         }
         .register-container {
-            background: rgba(20, 20, 30, 0.9); padding: 40px; border-radius: 15px;
+            background: rgb(0, 0, 0); padding: 40px; border-radius: 15px;
             width: 500px; box-shadow: 0 0 20px rgba(0, 200, 255, 0.2); color: #ffffff;
             border: 1px solid rgba(255,255,255,0.1);
         }
@@ -70,6 +70,17 @@
                 $(this).val(val);
             });
 
+            $("input[name='userType']").change(function(){
+                if($(this).val() == 'doctor') {
+                    $("#doctorFields").slideDown(); // 부드럽게 보여주기
+                } else {
+                    $("#doctorFields").slideUp();   // 부드럽게 숨기기
+                    // 일반 회원으로 돌아갈 때 입력값 초기화 (선택사항)
+                    $("input[name='licenseId']").val("");
+                    $("input[name='deptId']").val("");
+                }
+            });
+
             $("#regBtn").click(function(){
                 var id = $("input[name='id']").val();
                 var pwd = $("input[name='pwd']").val();
@@ -79,6 +90,7 @@
                 var gender = $("input[name='gender']").val();
                 var phoneNumber = $("input[name='phoneNumber']").val();
                 var isAgreed = $("#agreeCheck").is(":checked");
+                var userType = $("input[name='userType']:checked").val();
 
                 if(isIdChecked == false){
                     alert("아이디를 중복확인을 해주세요!");
@@ -92,6 +104,21 @@
                 if(pwd != pwd2) { alert("비밀번호가 일치하지 않습니다."); $("#pwd2").focus(); return; }
                 if(name == "") { alert("이름을 입력해주세요."); $("input[name='name']").focus(); return; }
 
+                if(userType == 'doctor') {
+                    var licenseId = $("input[name='licenseId']").val();
+                    var deptId = $("input[name='deptId']").val();
+
+                    if(licenseId == "") {
+                        alert("의사 면허 번호를 입력해주세요.");
+                        $("input[name='licenseId']").focus();
+                        return;
+                    }
+                    if(deptId == "") {
+                        alert("부서 번호를 입력해주세요.");
+                        $("input[name='deptId']").focus();
+                        return;
+                    }
+                }
                 // 주민번호 검사
                 if(birthDate.length != 8 || gender.length != 1) {
                     alert("주민등록번호를 올바르게 입력해주세요.");
@@ -161,6 +188,17 @@
                     <label for="type_doc">의사 회원</label>
                 </div>
             </div>
+            <div id="doctorFields" style="display: none;">
+                <div class="mb-3">
+                    <label class="form-label text-white">의사 면허 번호</label>
+                    <input type="text" name="licenseId" class="form-control" placeholder="면허 번호 입력">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white">부서 번호</label>
+                    <input type="number" name="deptId" class="form-control" placeholder="부서 번호 입력 (숫자)">
+                </div>
+            </div>
+
 
             <div class="mb-3">
                 <label class="form-label">아이디</label>

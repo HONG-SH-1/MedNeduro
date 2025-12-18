@@ -91,5 +91,12 @@ public class ControllerLogin {
             return "중복된 아이디입니다.";
         }
     }
+    // http://localhost:8080/test1Page
+    @GetMapping("test1Page")
+    public String test1Page() {return "z01_Project/Minsu_page/test1";}
+
+    // http://localhost:8080/test2Page
+    @GetMapping("test2Page")
+    public String test2Page() {return "z01_Project/Minsu_page/test2";}
 }
 
