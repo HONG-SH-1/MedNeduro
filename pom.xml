@@ -90,6 +90,11 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
+        <!-- BCrypt - 비밀번호 해쉬 및 솔트처리 과정을 위한 xml 설정. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 
     </dependencies>
 

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service;
 public class req_ServiceComent {
 
     @Autowired(required = false)
-    private req_DAOComent dao;
+    private req_RepositoryComent dao;
 
 }

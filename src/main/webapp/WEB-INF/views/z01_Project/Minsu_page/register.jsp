@@ -179,6 +179,12 @@
         <h2 class="text-center fw-bold mb-4">회원가입</h2>
 
         <form action="${path}/registerProc" method="post">
+            <%-- CSRF 토큰도 같이 보냄! 이게 없을 경우 서버가 발행한 비밀 키를 인식하지 못하여 403 Forbidden 오류 발생--%>
+            <%-- 1. 사용자가 가입 페이지에 들어옴 -> 난수 생성  --%>
+            <%-- 2. 사용가자 가입 버튼을 누르면 아이디/비번과 함께 암호표가 서버로 다시 전달 --%>
+            <%-- 3. 서버에서는 Bean에서 미리 생성된 암호표(난수)가 맞으며 가입을 승인! --%>
+            <%-- 비밀번호의 해시, 솔트와는 다른 개념으로 단순히 가짜 사이트의 요청을 막기 위한 일회용 출입증! --%>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             <div class="mb-3 text-center">
                 <div class="user-type-selector">
                     <input type="radio" name="userType" id="type_gen" value="general" checked>
