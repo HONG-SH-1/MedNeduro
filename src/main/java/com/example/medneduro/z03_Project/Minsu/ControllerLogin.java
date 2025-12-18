@@ -35,10 +35,10 @@ public class ControllerLogin {
             session.setAttribute("id", id);
             // session.setAttribute("pwd", pwd); // 보안상 비번은 세션에 안 담는 게 좋음
             if (userType.equals("general")) {
-                return "redirect:/maingeneralpage";
+                return "redirect:/viewer/index.html";
             }
             if (userType.equals("doctor")) {
-                return "redirect:/maindoctorpage";
+                return "redirect:/viewer/index.html";
             }
         } else {
             d.addAttribute("msg", "아이디 혹은 비밀번호가 틀렸습니다 다시 로그인 해주세요.");
