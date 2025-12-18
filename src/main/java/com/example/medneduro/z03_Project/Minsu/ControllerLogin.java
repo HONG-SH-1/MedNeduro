@@ -47,38 +47,44 @@ public class ControllerLogin {
         return "z01_Project/Minsu_page/login";
     }
 
-    // ... (페이지 이동 매핑 유지) ...
+    // 페이지 이동 매핑 유지 -> 뷰 매핑
     @GetMapping("maindoctorpage")
     public String maindoctorpage() { return "z01_Project/Minsu_page/maindoctor"; }
+    // return으로 페이지 전환
     @GetMapping("maingeneralpage")
     public String maingeneralpage() { return "z01_Project/Minsu_page/maingeneral"; }
     @GetMapping("registerPage")
     public String registerPage() { return "z01_Project/Minsu_page/register"; }
 
 
-    // ★ 회원가입 처리 (수정됨)
+    // ★ 회원가입 처리 (수정 완료 버전)
     @PostMapping("registerProc")
     public String registerProc(Register register, RedirectAttributes d) {
-        // 서비스 결과(String) 받기
+
+        // 1. 서비스 호출
         String result = service.registerProc(register);
 
+        // 2. 결과에 따른 메시지 및 이동 처리
         if(result.equals("SUCCESS")) {
             d.addFlashAttribute("msg", "회원가입이 완료되었습니다! 로그인 해주세요.");
-            return "redirect:/loginpage";
+            return "redirect:/loginpage"; // 성공 시 로그인 페이지로
         }
+
+        // --- 실패 케이스들 (모두 다시 가입 페이지로 튕겨줌) ---
         else if(result.equals("DUPLICATE_ID")) {
             d.addFlashAttribute("msg", "이미 사용 중인 아이디입니다.");
-            return "redirect:/registerPage";
         }
-        // 동일 인물 데이터 유효성 검사 수정 전
-        else if(result.equals("PATIENT_NOT_FOUND")) {
-            d.addFlashAttribute("msg", "일치하는 환자 정보가 없습니다. 병원 원무과에 문의해주세요.");
-            return "redirect:/registerPage";
+        else if("STAFF_NOT_FOUND".equals(result)) {
+            d.addFlashAttribute("msg", "등록된 의료진 정보가 없습니다. 인사팀에 문의하세요.");
+        }
+        else if("ALREADY_REGISTERED".equals(result)) {
+            d.addFlashAttribute("msg", "이미 가입된 의료진 계정이 있습니다.");
         }
         else {
-            d.addFlashAttribute("msg", "회원가입 중 오류가 발생했습니다.");
-            return "redirect:/registerPage";
+            d.addFlashAttribute("msg", "회원가입 중 알 수 없는 오류가 발생했습니다.");
         }
+        // 실패 시 공통적으로 가입 페이지로 리다이렉트
+        return "redirect:/registerPage";
     }
 
     @GetMapping("checkId")

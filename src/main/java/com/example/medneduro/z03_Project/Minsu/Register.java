@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class Register {
         // [1] 계정 정보
-        private int accountId;       // DB 생성 ID
+        private Integer accountId;       // DB 생성 ID
         private String id;           // 로그인 ID
         private String pwd;          // 비번
         private String userType;     // "general"(G) / "doctor"(D)
@@ -28,7 +28,7 @@ public class Register {
     public Register() {
     }
 
-    public Register(int accountId, String id, String pwd, String userType, String name, String phoneNumber, String email, String birthDate, String gender, String licenseNo, String deptId) {
+    public Register(Integer accountId, String id, String pwd, String userType, String name, String phoneNumber, String email, String birthDate, String gender, String licenseNo, String deptId) {
         this.accountId = accountId;
         this.id = id;
         this.pwd = pwd;
@@ -46,7 +46,7 @@ public class Register {
         return accountId;
     }
 
-    public void setAccountId(int accountId) {
+    public void setAccountId(Integer accountId) {
         this.accountId = accountId;
     }
 

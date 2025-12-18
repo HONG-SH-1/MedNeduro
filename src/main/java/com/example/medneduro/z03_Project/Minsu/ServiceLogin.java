@@ -36,7 +36,7 @@ public class ServiceLogin {
         // 1. 중복 체크
         if(dao.checkId(reg.getId()) > 0) return "DUPLICATE_ID";
 
-        // 2. 성별 변환 (환자용)
+        // 2. 성별 변환
         String rawGender = reg.getGender();
         if("1".equals(rawGender) || "3".equals(rawGender)) reg.setGender("M");
         else if("2".equals(rawGender) || "4".equals(rawGender)) reg.setGender("F");
@@ -48,32 +48,40 @@ public class ServiceLogin {
 
         // 4. 분기 처리
         if("G".equals(reg.getUserType())) {
-            // === [환자] 이름+폰+생일+성별 ===
-            Integer existingAccountId = dao.findPatientAccountId(reg);
+            // ==========================================
+            // [CASE 1] 일반 사용자 (General) -> 신규 생성
+            // ==========================================
 
-            if(existingAccountId == null) return "PATIENT_NOT_FOUND";
-            if(existingAccountId != 0) return "ALREADY_REGISTERED";
-
+            // 1) 통합 계정 생성 (먼저 실행해서 accountId 확보)
             dao.insertAccount(reg);
-            if(dao.linkPatientAccount(reg) == 0) throw new RuntimeException("환자 연결 실패");
+
+            // 2) 일반 사용자 정보 테이블에 INSERT
+            int result = dao.insertGeneralMember(reg);
+
+            if(result == 0) {
+                throw new RuntimeException("일반 사용자 정보 등록 실패");
+            }
 
         } else if("D".equals(reg.getUserType())) {
-            // === [의료진] 이름+면허번호+부서코드 ===
+            
+            //  의료진 (Doctor) -> 매칭
 
-            // 1) 매칭 확인 (이름, 면허번호, 부서코드)
+            // 1) 이름+면허번호+부서번호를 DAO단에서 매칭 후, 조회된 ACCOUNT_ID 값을 저장.
             Integer existingAccountId = dao.findMedicalStaffAccountId(reg);
 
-            // 2) 정보 없음 (입력한 면허번호/부서가 틀렸거나 등록된 의사가 아님)
+            // 2) 정보 없음 (회사에 등록된 의사가 아님)
             if(existingAccountId == null) return "STAFF_NOT_FOUND";
 
-            // 3) 이미 가입됨
+            // 3) 이미 가입된 계정이 있음
             if(existingAccountId != 0) return "ALREADY_REGISTERED";
 
-            // 4) 가입 진행
+            // 4) 통합 계정 생성
             dao.insertAccount(reg);
 
-            // 5) 연결
-            if(dao.linkMedicalStaffAccount(reg) == 0) throw new RuntimeException("의료진 연결 실패");
+            // 5) 의료진 테이블 연결 (Update)
+            if(dao.linkMedicalStaffAccount(reg) == 0) {
+                throw new RuntimeException("의료진 연결 실패");
+            }
         }
 
         return "SUCCESS";
