@@ -134,6 +134,18 @@
     </div>
 </div>
 
+<div id="myModal" class="modal-overlay hidden">
+    <div class="modal-window">
+        <div class="modal-header">
+            <span class="modal-title">분석 결과 리포트</span> <button class="close-btn">&times;</button> </div>
+        <div class="modal-body">
+            <p>여기에 모달창의 내용이 들어갑니다.</p>
+            <p>사진 속 메모장처럼 하얀 배경이 될 부분입니다.</p>
+        </div>
+    </div>
+</div>
 <script src=${path}/static/js/app.js></script>
 </body>
 </html>
+
+
