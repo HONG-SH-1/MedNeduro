@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>MedNeuro - NII 2D/3D Viewer</title>
 
-    <link rel="stylesheet" href="${path}/css/style.css"/>
+    <link rel="stylesheet" href="${path}/static/css/style.css"/>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
@@ -57,9 +57,9 @@
         <aside id="toolPanel" class="tool-panel hidden">
             <div class="tool-panel-head">Axis</div>
             <div class="tool-buttons">
-                <button class="btn axis" data-axis="axial"><img src="${path}/images/axial.PNG" alt="Axial"></button>
-                <button class="btn axis" data-axis="coronal"><img src="${path}/images/coronal.PNG" alt="Coronal"></button>
-                <button class="btn axis" data-axis="sagittal"><img src="${path}/images/sagital.PNG" alt="Sagittal"></button>
+                <button class="btn axis" data-axis="axial"><img src="${path}/static/axial.PNG" alt="Axial"></button>
+                <button class="btn axis" data-axis="coronal"><img src="${path}/static/coronal.PNG" alt="Coronal"></button>
+                <button class="btn axis" data-axis="sagittal"><img src="${path}/static/sagital.PNG" alt="Sagittal"></button>
             </div>
         </aside>
 

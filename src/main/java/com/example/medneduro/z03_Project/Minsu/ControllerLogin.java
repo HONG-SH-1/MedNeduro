@@ -57,7 +57,7 @@ public class ControllerLogin {
                 return "redirect:/viewer/index.html";
             }
             if (userType.equals("doctor")) {
-                return "redirect:/viewer/index.html";
+                return "redirect:/maindoctorpage";
             }
         } else {
             d.addAttribute("msg", "아이디 혹은 비밀번호가 틀렸습니다 다시 로그인 해주세요.");
