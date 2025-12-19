@@ -586,42 +586,46 @@ body{
     align-items: center;      /* 세로(상하) 가운데 정렬 */
 }
 .modal-window{
-    background-color: white;
-    width: 600px;
-    height: 400px;
+    background-color: #1C1C1E; /* 전체 배경을 어둡게 */
+    width: 800px;
+    height: 600px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8); /* 그림자도 더 깊게 */
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    color: black;
+    color: #E5E5E7; /* 기본 텍스트를 밝은 회색으로 */
+    border: 1px solid #3A3A3C; /* 모달 경계선 추가 */
 }
 .modal-header{
-    background-color: #f0f0f0;
-    padding: 12px 16px;
+    background-color: #2C2C2E; /* 헤더는 본문보다 약간 밝게 */
+    padding: 14px 20px;
     display: flex;
-    justify-content: space-between; /* 양 끝으로 배치!!*/
+    justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd;
-    font-weight: bold;
+    border-bottom: 1px solid #3A3A3C; /* 경계선 색상 조절 */
+    font-weight: 600;
+    color: #FFFFFF; /* 헤더 제목은 완전 화이트 */
 }
 .modal-body {
     padding: 20px;
-    overflow-y: auto; /* 내용이 넘치면 스크롤 */
+    overflow-y: auto;
     flex: 1;
+    border: 1.5px solid #1C1C1E; /* 트랙 배경색과 같은 보더를 주면 막대가 얇아 보이고 여백이 생김 */
 }
 
 /* 5. 닫기 버튼 스타일 */
 .close-btn {
     border: none;
     background: transparent;
-    font-size: 24px;
+    font-size: 20px;
     cursor: pointer;
+    color: #8E8E93; /* 기본 상태는 차분하게 */
     line-height: 1;
 }
 
 .close-btn:hover {
-    color: red;
+    color: #FF453A; /* 호버 시에만 강조(시스템 레드) */
 }
 
 /* 6. 숨김 처리용 (JS로 제어할 예정) */
@@ -630,20 +634,24 @@ body{
 }
 /* --- 파일 리스트 스타일 --- */
 .file-list-group {
-    list-style: none; /* 점 없애기 */
+    list-style: none;
     padding: 0;
     margin: 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid #3A3A3C; /* 리스트 전체 외곽선 */
+    border-radius: 6px;
+    background-color: #262629; /* 리스트 배경색 */
 }
 
 .file-item {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer; /* 마우스 올리면 손가락 모양 */
-    transition: background-color 0.2s;
+    padding: 10px 20px;
+    border-bottom: 1px solid #3A3A3C;
+    cursor: pointer;
+    transition: all 0.2s ease;
     display: flex;
-    justify-content: space-between; /* 내용과 날짜 양끝 정렬 */
+    justify-content: space-between;
+    align-items: center;
+    color: #D1D1D6; /* 파일 항목 글자색 */
+    font-size: 0.95rem;
 }
 
 .file-item:last-child {
@@ -651,11 +659,34 @@ body{
 }
 
 .file-item:hover {
-    background-color: #f0f8ff; /* 마우스 올렸을 때 연한 하늘색 */
-    font-weight: bold;
+    background-color: #3A3A3C; /* 밝은 파랑 대신 짙은 회색으로 */
+    color: #FFFFFF; /* 글자는 더 선명하게 */
 }
 
 .date {
-    color: #888;
-    font-size: 0.9em;
+    color: #636366; /* 날짜는 가독성을 방해하지 않게 저채도로 */
+    font-size: 0.85em;
 }
+
+/* 1. 스크롤바 전체 너비 설정 */
+.modal-body::-webkit-scrollbar {
+    width: 5px;  /* 스크롤바 두께 (기존보다 얇게) */
+}
+.modal-body::-webkit-scrollbar-thumb {
+    background: #3A3A3C; /* 막대 색상 */
+    border-radius: 10px;
+    /* 핵심: 위아래에 배경색과 똑같은 색의 두꺼운 보더를 넣어서 짧아 보이게 함 */
+    border: 3px solid #1C1C1E;
+}
+
+/* 2. 스크롤바 배경 (트랙) */
+.modal-body::-webkit-scrollbar-track {
+    background: transparent; /* 본문 배경색과 동일하게 맞춰 일체감 부여 */
+}
+
+/* 4. 마우스 올렸을 때 막대 색상 */
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #48484A; /* 호버 시 아주 살짝 밝아지게 */
+}
+
+

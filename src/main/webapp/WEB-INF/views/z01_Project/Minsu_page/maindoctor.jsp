@@ -152,12 +152,13 @@
                 </li>
                 <li class="file-item" data-filename="Patient_Lee_Spine.nii">
                     <strong>이영희 (F/32)</strong> - C-Spine <span class="date">2023-11-05</span>
-                </li>
             </ul>
 
         </div>
     </div>
 </div>
+
+
 <script src=${path}/static/js/app.js></script>
 </body>
 </html>
