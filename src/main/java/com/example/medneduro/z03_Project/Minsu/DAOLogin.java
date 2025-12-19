@@ -88,8 +88,8 @@ public interface DAOLogin {
     // (이름 + 면허번호 + 부서코드) -> 해당 계정 아이디 유무 확인
     @Select("SELECT NVL(ACCOUNT_ID, 0) FROM MEDICAL_STAFF " +
             "WHERE STAFF_NAME = #{name} " +
-            "AND LICENSE_NO = #{licenseNo} " +
-            "AND DEPT_ID = #{deptId}")
+            "AND LICENSE_NO = #{licenseNo, jdbcType=VARCHR} " +
+            "AND DEPT_ID = #{deptId, jdbcType=VARCHR}")
     Integer findMedicalStaffAccountId(Register reg);
 
     // 5. 의료진 계정 연결
