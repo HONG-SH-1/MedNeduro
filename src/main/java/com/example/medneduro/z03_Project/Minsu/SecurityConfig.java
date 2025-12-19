@@ -62,11 +62,11 @@ public class SecurityConfig {
                 // CORS 설정 적용 (CorsConfig 클래스 설정 따라감)
                 .cors(withDefaults())
 
-                // ★ [수정 2] /api/로 시작하는 주소는 로그인 없이 허용
+                // ★ [수정 2] /api/로 시작하는 주소는 로그인 없이 허용 --> 특정 경로에는 프리패스를 부여!
                 .authorizeHttpRequests(auth -> auth
-                        // "/api/**" 경로는 누구나(permitAll) 접근 가능하게 설정
+                        // API 주소와 정적 파일들을 인증 없이 통과..!
                         .requestMatchers("/api/**", "/css/**", "/js/**", "/images/**").permitAll()
-                        .anyRequest().permitAll() // 혹은 개발 중이니 전체 허용
+                        .anyRequest().permitAll() // 이건 그 외 모든 요청도 일단 허용(개발 단계)
                 );
 
         return http.build();

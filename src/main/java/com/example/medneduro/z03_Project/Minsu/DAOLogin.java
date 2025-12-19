@@ -64,6 +64,9 @@ public interface DAOLogin {
     @Insert("INSERT INTO INTEGRATED_ACCOUNT " +
             "(ACCOUNT_ID, LOGIN_ID, PASSWORD, USER_TYPE, LAST_LOGIN_DATE, JOIN_DATE) " +
             "VALUES (#{accountId}, #{id}, #{pwd}, #{userType}, NULL, SYSDATE)")
+    // 일반회원이든, 의사든 이 SelectKey를 통해 시퀀스 번호를 가져옴
+    // keyProperty = 값 --> 해당 값이 Register 객체의 setAccountId(값)을 강제로 실행!
+    // 이후 #{accountId}를 통해 할당된 값을 가져옴..
     @SelectKey(statement = "SELECT SEQ_INTEGRATED_ACCOUNT.NEXTVAL FROM DUAL",
             keyProperty = "accountId", before = true, resultType = int.class)
     int insertAccount(Register reg);
@@ -88,8 +91,8 @@ public interface DAOLogin {
     // (이름 + 면허번호 + 부서코드) -> 해당 계정 아이디 유무 확인
     @Select("SELECT NVL(ACCOUNT_ID, 0) FROM MEDICAL_STAFF " +
             "WHERE STAFF_NAME = #{name} " +
-            "AND LICENSE_NO = #{licenseNo, jdbcType=VARCHR} " +
-            "AND DEPT_ID = #{deptId, jdbcType=VARCHR}")
+            "AND LICENSE_NO = #{licenseNo, jdbcType=VARCHAR} " +
+            "AND DEPT_ID = #{deptId, jdbcType=VARCHAR}")
     Integer findMedicalStaffAccountId(Register reg);
 
     // 5. 의료진 계정 연결
