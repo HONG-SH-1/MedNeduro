@@ -582,8 +582,8 @@ body{
     background-color: rgba(0,0,0,0.5);
     z-index: 2000;
     display: flex;
-    justify-items: center;
-    align-items: center;
+    justify-content: center;  /* 가로(좌우) 가운데 정렬 */
+    align-items: center;      /* 세로(상하) 가운데 정렬 */
 }
 .modal-window{
     background-color: white;
@@ -628,4 +628,34 @@ body{
 .hidden {
     display: none !important;
 }
+/* --- 파일 리스트 스타일 --- */
+.file-list-group {
+    list-style: none; /* 점 없애기 */
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
 
+.file-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer; /* 마우스 올리면 손가락 모양 */
+    transition: background-color 0.2s;
+    display: flex;
+    justify-content: space-between; /* 내용과 날짜 양끝 정렬 */
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+.file-item:hover {
+    background-color: #f0f8ff; /* 마우스 올렸을 때 연한 하늘색 */
+    font-weight: bold;
+}
+
+.date {
+    color: #888;
+    font-size: 0.9em;
+}

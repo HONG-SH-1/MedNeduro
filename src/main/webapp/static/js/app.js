@@ -628,3 +628,56 @@ function animateThree() {
     three.renderer.render(three.scene, three.camera);
   }
 }
+
+// HTML 문서가 다 로딩 될 때까지 기다리라는 명령어
+// 웹 페이지의 경우 위에서 아래로 흐르는데, 모달이나 버튼이 화면에 그려기지도 전에 자바스크립트가 먼저
+// 버튼을 찾아줘!라고 명령해버리면 오류가 남.. 따라서 화면 그리기 끝나고 나서 DOMContentLoaded 안의 코드를 실행하라!!
+document.addEventListener('DOMContentLoaded', function() {
+
+    // ID가 myModal인 놈을 modal에 저장..!
+    const modal = document.getElementById('myModal');
+    // ALL을 사용하여 해당 해당 클래스를 가진 녀석들을 몽땅 찾아서 배열 리스트형태로 가져오기
+    const fileItems = document.querySelectorAll('.file-item');
+    // 메인 화면의 '업로드 파일' 글자 부분
+    const mainFileNameDisplay = document.getElementById('fileName');
+    const btnClose = document.querySelector('.close-btn');
+
+    // 1. 리스트 아이템 하나하나에 '클릭 이벤트' 달아주기
+    fileItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            // (1) 클릭한 아이템의 파일 이름 가져오기 (data-filename 속성)
+            const selectedFile = item.getAttribute('data-filename');
+
+            // (2) 메인 화면에 파일 이름 업데이트 (선택된 파일 보여주기)
+            if(mainFileNameDisplay) {
+                mainFileNameDisplay.textContent = selectedFile;
+                mainFileNameDisplay.style.color = "#4CAF50"; // 초록색으로 강조
+                mainFileNameDisplay.style.fontWeight = "bold";
+            }
+
+            // (3) 모달 닫기
+            modal.classList.add('hidden');
+
+            // (4) 여기에 나중에 실제 파일을 서버에서 불러오는 코드를 넣으면 돼!
+            console.log("선택된 파일:", selectedFile);
+            alert(selectedFile + " 파일을 불러옵니다."); // 확인용 알림창
+        });
+    });
+
+    // 2. 닫기(X) 버튼 기능 (선택 안 하고 닫을 때)
+    if (btnClose) {
+        btnClose.addEventListener('click', function() {
+            modal.classList.add('hidden');
+        });
+    }
+    if(modal){
+        modal.addEventListener('click',function(event){
+            // modal은 화면 전첼르 덮는 어두운 배경!
+            // 사용자가 클릭한 곳이 어두운 배경일 때 닫으라는 것!
+            if(event.target === modal){
+                modal.classList.add('hidden');
+            }
+        });
+    }
+});
+
