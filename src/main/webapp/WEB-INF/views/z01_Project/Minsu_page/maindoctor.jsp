@@ -134,6 +134,6 @@
     </div>
 </div>
 
-<script src="${path}/js/app.js"></script>
+<script src=${path}/static/js/app.js></script>
 </body>
 </html>
