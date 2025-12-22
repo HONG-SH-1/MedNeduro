@@ -109,7 +109,7 @@ public class ModelController {
                 "fileId", fileId,
                 "axis", axis,
                 "sliceCount", pyResult.get("sliceCount"),
-                "baseUrl", "/api/slices/" + fileId + "/" + axis + "/"
+                "baseUrl", "/slices/" + fileId + "/" + axis + "/"
         );
     }
 
@@ -162,7 +162,7 @@ public class ModelController {
         return Map.of(
                 "ok", true,
                 "fileId", fileId,
-                "objUrl", "/api/obj/" + fileId + "/model.obj",
+                "objUrl", "/obj/" + fileId + "/model.obj",
                 "meta", pyResult
         );
     }
