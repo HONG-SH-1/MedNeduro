@@ -66,7 +66,7 @@ public class ControllerLogin {
                 return "redirect:/viewer/index.html";
             }
             if (userType.equals("doctor")) {
-                return "redirect:/maindoctorpage";
+                return "redirect:/mainDoctor";
             }
         } else {
             d.addAttribute("msg", "아이디 혹은 비밀번호가 틀렸습니다 다시 로그인 해주세요.");
@@ -75,12 +75,7 @@ public class ControllerLogin {
         return "z01_Project/Minsu_page/login";
     }
 
-    // 페이지 이동 매핑 유지 -> 뷰 매핑
-    @GetMapping("maindoctorpage")
-    public String maindoctorpage(Model d) {
 
-        return "z01_Project/Minsu_page/maindoctor";
-    }
     // return으로 페이지 전환
     @GetMapping("maingeneralpage")
     public String maingeneralpage(Model d) {
