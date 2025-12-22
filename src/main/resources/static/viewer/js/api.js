@@ -1,6 +1,8 @@
 /**
  * ✅ api.js
  * - 서버 통신만 담당 (원본 app.js의 $.ajax들 그대로 이동)
+ *
+ *
  */
 
 import { API_BASE } from "./state.js";

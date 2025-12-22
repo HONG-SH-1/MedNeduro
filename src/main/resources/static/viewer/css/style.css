@@ -1,4 +1,9 @@
 /* ✅ CSS 모듈 분리 (순서 중요: base -> layout -> viewer -> thumbs -> rightbar -> responsive) */
+/*
+모듈화를 위해서 import 사용
+index에 보면 link 사용
+*/
+
 @import url("./base.css");
 @import url("./layout.css");
 @import url("./viewer.css");

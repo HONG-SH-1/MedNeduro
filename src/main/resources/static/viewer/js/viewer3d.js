@@ -2,6 +2,7 @@
  * ✅ viewer3d.js
  * - 3D 변환/Three.js 로드 로직만 분리
  * - 원본 동작 그대로
+ * 3d 변환 요청 + three 초기화 + obj 로딩 + 렌더링
  */
 
 import { three } from "./state.js";

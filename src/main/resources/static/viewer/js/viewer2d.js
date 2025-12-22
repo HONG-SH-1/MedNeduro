@@ -2,6 +2,7 @@
  * ✅ viewer2d.js
  * - 2D 슬라이스/썸네일/휠 이동 로직만 분리
  * - 원본 동작 그대로
+ * 2d 기능 전담
  */
 
 import { sessions, getActiveSessionId, API_BASE } from "./state.js";

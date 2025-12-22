@@ -2,6 +2,7 @@
  * ✅ state.js
  * - 원본 app.js에 있던 "전역 상태"를 모듈로 분리
  * - 동작은 그대로, 위치만 바꾼 것
+ * 여러 모듈이 공유해야하는 전역 상태를 한곳에서 관리
  */
 
 export const API_BASE = `http://localhost:8080/api`;

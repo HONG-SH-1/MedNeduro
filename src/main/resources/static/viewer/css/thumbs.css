@@ -1,3 +1,9 @@
+/*
+썸네일 바
+썸네일 ui만 책임 지는 파일
+*/
+
+
 /* ✅ (수정 3) 썸네일 바 + 토글 버튼 */
 .thumbbar{
     border-top:1px solid var(--line);

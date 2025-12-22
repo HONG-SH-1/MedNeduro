@@ -2,6 +2,7 @@
  * ✅ ui.js
  * - 화면 전환/탭 렌더/툴패널 토글/썸네일바 토글 등 "UI 조작"만 분리
  * - 원본 함수/동작 그대로 이동
+ * 기능 로직이 아니라 ui 상태를 바꿈
  */
 
 import { sessions, getActiveSessionId, setActiveSessionId } from "./state.js";
