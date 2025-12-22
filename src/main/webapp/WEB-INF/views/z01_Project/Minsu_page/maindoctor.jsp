@@ -169,7 +169,7 @@
             <li class="recent-item">
                 <div class="ri-header">
                     <span class="ri-name">김철수 (M/45)</span>
-                    <span class="ri-badge status-danger">재검요망</span>
+                    <span class="ri-badge">의사명</span>
                 </div>
                 <div class="ri-info">Brain T1 Sequence</div>
                 <div class="ri-date">2023.12.19 14:30</div>
