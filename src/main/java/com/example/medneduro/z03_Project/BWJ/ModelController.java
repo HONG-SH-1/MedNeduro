@@ -309,7 +309,7 @@ public class ModelController {
      */
     pythonRunnerService.ensureDirExists(uploadDir);
     /*
-        폴더가 있으면 그 폴더안에 넣고 없으면 폴더를 새로 생성하는 코드입니다 .ㅇ
+        폴더가 있으면 그 폴더안에 넣고 없으면 폴더를 새로 생성하는 코드입니다
      */
     Path targetPath = Paths.get(uploadDir, fileId + ext);
     Files.copy(source, targetPath, StandardCopyOption.REPLACE_EXISTING);

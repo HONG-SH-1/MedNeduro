@@ -71,7 +71,7 @@ public class ControllerLogin {
     // 페이지 이동 매핑 유지 -> 뷰 매핑
     @GetMapping("maindoctorpage")
     public String maindoctorpage(Model d) {
-        d.addAttribute("RAlist",service);
+
         return "z01_Project/Minsu_page/maindoctor";
     }
     // return으로 페이지 전환

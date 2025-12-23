@@ -3,7 +3,10 @@ package com.example.medneduro.z03_Project.Minsu;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.security.PublicKey;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.security.crypto.password.PasswordEncoder;
 // 위 임포트는 비밀번호 보안을 위해 추가 됨..
@@ -126,4 +129,9 @@ public class ServiceLogin {
 
         return "SUCCESS";
     }
+
+    public List<MriListM> getMyMriList(String loginId){
+        return dao.getMriList(loginId);
+    }
+
 }

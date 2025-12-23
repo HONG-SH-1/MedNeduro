@@ -140,23 +140,29 @@
             <span class="modal-title">환자 MRI 리스트 선택</span>
             <button class="close-btn">&times;</button>
         </div>
+
         <div class="modal-body">
-            <p style="margin-bottom: 10px; color: #666;">분석할 파일을 선택해주세요.</p>
+            <div class="modal-top-section">
+                <p class="modal-desc">분석할 파일을 선택해주세요.</p>
 
-            <ul class="file-list-group">
-                <li class="file-item" data-filename="Patient_Kim_Brain_T1.nii">
-                    <strong>김철수 (M/45)</strong> - Brain T1 Sequence <span class="date">2023-12-19</span>
-                </li>
-                <li class="file-item" data-filename="Patient_Kim_Brain_T2.nii">
-                    <strong>김철수 (M/45)</strong> - Brain T2 Sequence <span class="date">2023-12-19</span>
-                </li>
-                <li class="file-item" data-filename="Patient_Lee_Spine.nii">
-                    <strong>이영희 (F/32)</strong> - C-Spine <span class="date">2023-11-05</span>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="파일명 검색 (예: T1, Brain...)" autocomplete="off">
+                </div>
+            </div>
+
+            <ul id="modalFileList" class="modal-file-list">
             </ul>
-
         </div>
+
     </div>
 </div>
+
+
+
+
+
+
+<!-- 이하 최근 분석 기록 -->
 <div id="recentDrawerOverlay" class="drawer-overlay"></div>
 <div id="recentDrawer" class="side-drawer">
     <div class="drawer-header">
@@ -179,7 +185,21 @@
 </div>
 
 
+<script>
+    const SERVER_PATIENT_LIST = [
+        <c:forEach var="mri" items="${patientList}" varStatus="status">
+        {
+            name: "${mri.patientName}",   // 환자 이름
+            gender: "${mri.gender}",      // 성별 (필요시)
+            birth: "${mri.birthDate}",    // 생년월일 (필요시)
+            fileName: "${mri.name}"       // 파일명
+        }<c:if test="${!status.last}">,</c:if>
+        </c:forEach>
+    ];
+</script>
+
 <script src=${path}/static/js/app.js></script>
+
 </body>
 </html>
 

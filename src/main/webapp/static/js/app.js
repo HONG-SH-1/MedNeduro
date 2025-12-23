@@ -650,55 +650,125 @@ function animateThree() {
   }
 }
 
+
+
+
 // HTML 문서가 다 로딩 될 때까지 기다리라는 명령어
 // 웹 페이지의 경우 위에서 아래로 흐르는데, 모달이나 버튼이 화면에 그려기지도 전에 자바스크립트가 먼저
 // 버튼을 찾아줘!라고 명령해버리면 오류가 남.. 따라서 화면 그리기 끝나고 나서 DOMContentLoaded 안의 코드를 실행하라!!
 document.addEventListener('DOMContentLoaded', function() {
 
-    // ID가 myModal인 놈을 modal에 저장..!
+    // 1. 요소 선택 (변수 저장)
     const modal = document.getElementById('myModal');
-    // ALL을 사용하여 해당 해당 클래스를 가진 녀석들을 몽땅 찾아서 배열 리스트형태로 가져오기
-    const fileItems = document.querySelectorAll('.file-item');
-    // 메인 화면의 '업로드 파일' 글자 부분
-    const mainFileNameDisplay = document.getElementById('fileName');
+    const listContainer = document.getElementById('modalFileList'); // 리스트가 들어갈 UL
+    const searchInput = document.getElementById('searchInput');
     const btnClose = document.querySelector('.close-btn');
+    const mainFileNameDisplay = document.getElementById('fileName'); // 메인화면 파일명 표시부
 
-    // 1. 리스트 아이템 하나하나에 '클릭 이벤트' 달아주기
-    fileItems.forEach(function(item) {
-        item.addEventListener('click', function() {
-            // (1) 클릭한 아이템의 파일 이름 가져오기 (data-filename 속성)
-            const selectedFile = item.getAttribute('data-filename');
+    // JSP에서 넘겨준 데이터 가져오기 (없으면 빈 배열로 방어)
+    const patientData = (typeof SERVER_PATIENT_LIST !== 'undefined') ? SERVER_PATIENT_LIST : [];
 
-            // (2) 메인 화면에 파일 이름 업데이트 (선택된 파일 보여주기)
-            if(mainFileNameDisplay) {
-                mainFileNameDisplay.textContent = selectedFile;
-                mainFileNameDisplay.style.color = "#4CAF50"; // 초록색으로 강조
-                mainFileNameDisplay.style.fontWeight = "bold";
-            }
+    // 2. 리스트 그리기 함수 (핵심!)
+    // 데이터(배열)를 받아서 화면에 <li> 태그를 만들어주는 역할
+    function renderList(data) {
+        listContainer.innerHTML = ''; // 기존 목록 싹 비우기 (초기화)
+        if (data.length === 0) {
+            listContainer.innerHTML = '<li style="padding:20px; text-align:center; color:#888;">검색 결과가 없습니다.</li>';
+            return;
+        }
 
-            // (3) 모달 닫기
-            modal.classList.add('hidden');
+        // 데이터 하나하나 돌면서 HTML 만들기
+        data.forEach(function(p) {
+            const li = document.createElement('li');
+            li.className = 'file-item'; // CSS 스타일 적용
 
-            // (4) 여기에 나중에 실제 파일을 서버에서 불러오는 코드를 넣으면 돼!
-            console.log("선택된 파일:", selectedFile);
-            alert(selectedFile + " 파일을 불러옵니다."); // 확인용 알림창
+            // (1) 확인 여부 마크 (삼항연산자)
+            const checkHtml = p.lastCheck
+                ? `<span style="font-size:0.8rem; color:#4CAF50;">✔ ${p.lastCheck}</span>`
+                : `<span style="font-size:0.8rem; color:#FF453A;">미확인</span>`;
+
+            // (2) 리스트 내부 내용 (이름, 정보, 확인시간)
+            li.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <span class="p-name" style="font-weight:bold; font-size:1.1rem; color:#fff;">${p.name}</span>
+                    <span style="font-size:0.85rem; color:#aaa;">${p.birth} | ${p.gender} | ${p.fileName}</span>
+                </div>
+                ${checkHtml}
+            `;
+
+            // (3) 클릭 이벤트 달기 (여기서 해야 함!)
+            li.addEventListener('click', function() {
+                // 메인 화면 업데이트
+                if(mainFileNameDisplay) {
+                    mainFileNameDisplay.textContent = p.fileName;
+                    mainFileNameDisplay.style.color = "#4CAF50";
+                    mainFileNameDisplay.style.fontWeight = "bold";
+                }
+
+                // 파일 로드 알림 (추후 loadNiftiFromUrl(p.fileName) 등으로 교체)
+                alert(p.name + " 님의 영상(" + p.fileName + ")을 불러옵니다.");
+                console.log("선택된 파일:", p.fileName);
+
+                closeModal(); // 모달 닫기
+            });
+
+            // 만든 li를 ul 안에 집어넣기
+            listContainer.appendChild(li);
         });
-    });
+    }
 
-    // 2. 닫기(X) 버튼 기능 (선택 안 하고 닫을 때)
+    // -----------------------------------------------------------
+    // 3. 모달 제어 (열기/닫기)
+    // -----------------------------------------------------------
+    function openModal() {
+        if(modal) modal.classList.add('show'); // CSS의 .show { display: flex } 활용
+    }
+
+    function closeModal() {
+        if(modal) modal.classList.remove('show'); // .show를 제거해서 다시 숨김
+        if(searchInput) searchInput.value = '';   // 검색창 초기화
+        renderList(patientData);                  // 검색 필터 해제하고 전체 목록 복구
+    }
+
+    // 닫기 버튼(X) 클릭
     if (btnClose) {
-        btnClose.addEventListener('click', function() {
-            modal.classList.add('hidden');
-        });
+        btnClose.addEventListener('click', closeModal);
     }
-    if(modal){
-        modal.addEventListener('click',function(event){
-            // modal은 화면 전첼르 덮는 어두운 배경!
-            // 사용자가 클릭한 곳이 어두운 배경일 때 닫으라는 것!
-            if(event.target === modal){
-                modal.classList.add('hidden');
+
+    // 모달 바깥 배경 클릭 시 닫기
+    if (modal) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeModal();
             }
         });
     }
-});
 
+
+    // 4. 검색 기능 
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const keyword = searchInput.value.toUpperCase();
+
+            const filtered = patientData.filter(function(p) {
+                // 검사할 항목들 
+                const pName = p.name ? p.name.toUpperCase() : ''; // 이름 없으면 공백
+                const pFile = p.fileName ? p.fileName.toUpperCase() : ''; // 이름 없으면 공백
+                const pBirth = p.birth ? p.birth : ''; // 생년월일 없으면 공백
+
+                return pName.includes(keyword) ||
+                    pFile.includes(keyword) ||
+                    pBirth.includes(keyword);
+            });
+
+            // 걸러낸 데이터로 다시 그리기
+            renderList(filtered);
+        });
+    }
+
+    // -----------------------------------------------------------
+    // [최종 실행] 페이지 로딩이 끝나면 바로 실행되는 곳
+    // -----------------------------------------------------------
+    renderList(patientData); // 1. 리스트 만들기
+    openModal();             // 2. 모달 띄우기 (자동)
+});

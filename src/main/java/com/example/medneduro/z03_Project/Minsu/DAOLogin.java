@@ -1,6 +1,8 @@
 package com.example.medneduro.z03_Project.Minsu;
 
 import org.apache.ibatis.annotations.*;
+
+import java.util.List;
 import java.util.Map;
 
 @Mapper
@@ -103,13 +105,48 @@ public interface DAOLogin {
             "AND LICENSE_NO = #{licenseNo} " +
             "AND DEPT_ID = #{deptId}")
     int linkMedicalStaffAccount(Register reg);
-}
-
 /*
 추후 팁!
 COUNT(*) 외에도 MAX(), MIN(), SUM(), AVG() 같은 함수를 사용할 때!
 이 경우에는 0이 아닌 null이 나오기 때문에 워퍼 클래스 Integer을 사용하는 것을 권장..!
+*/
+@Select("""
+        SELECT 
+            m.MED_MRI_ID          AS medMriId,  -- MRI 고유 번호 (나중에 파일 로딩할 때 사용할 예정)
+            m.IMAGE_FOLDER_PATH   AS fileName,  -- 파일 경로
+            m.AI_ANALYSIS_STATUS  AS status,    -- AI 분석 상태(PENDING, COMPLETED 등)
+            TO_CHAR(m.UPLOAD_DT, 'YYYY-MM-DD') AS uploadDt, -- 날짜를 해당 패턴의 문자열로 치환
+            p.PATIENT_NAME        AS patientName,   -- 환자 이름(UI 출력)
+            p.GENDER              AS gender,        -- 환자 성별(UI 출력)
+            p.BIRTH_DATE          AS birthDate,     -- 환자 생년월일(UI 출력)
+            
+            -- [핵심] 서브쿼리로 '내가 마지막으로 본 시간' 가져오기
+            -- 해당 폴더의 가장 마지막 날짜를 출력해줌
+            (
+                SELECT TO_CHAR(MAX(l.ACCESS_DT), 'YYYY-MM-DD HH24:MI')
+                FROM MRI_ACCESS_LOG l
+                WHERE l.MED_MRI_ID = m.MED_MRI_ID   -- 지금 조회 중인 이 MRI 파일과 연결
+                  AND l.DOCTOR_ID  = s.STAFF_ID     -- 로그인한 자신과 연결
+                -- 이렇게 해야만 현재 로그인한 자신의 계정 아이디를 가져올 수 있음
+                -- 기존에 처리해도 똑같음..!
+            ) AS lastCheckTime            
 
+        FROM MEDICAL_MRI_FOLDER m -- 기준이 되는 MRI 폴더 목록
+        -- 1. 환자 정보 조인
+        -- MRI 폴더에는 환자 고유 번호만 있을뿐 상세 정보는 모르기 때문에 조인
+        INNER JOIN PATIENT p ON m.PATIENT_ID = p.PATIENT_ID
+        -- 2. 의사 정보 조인 (로그인 ID -> STAFF_ID 변환용)
+        -- MRI 테이블에는 담당 의사, 로그인 할 때 사용되는건 ACCOUNT_ID, 따라서 STAF테이블을 건너 로그인 고유 번호 확인
+        INNER JOIN MEDICAL_STAFF s ON m.DOCTOR_ID = s.STAFF_ID
+        INNER JOIN INTEGRATED_ACCOUNT a ON s.ACCOUNT_ID = a.ACCOUNT_ID
+        -- 3. 조건: 로그인한 의사(loginId)가 담당한 MRI만 조회
+        WHERE a.LOGIN_ID = #{loginId}
+        -- 4. 정렬: 최근 확인한 환자 우선 (NULL은 뒤로), 그 다음 최신 업로드 순
+        ORDER BY lastCheckTime DESC NULLS LAST, m.UPLOAD_DT DESC
+    """)
+List<MriListM> getMriList(String loginId);
+ // 파이썬에서 나이 계산해주면 편함..
+ //Python 코드로 실시간 계산하는 방식이 훨씬 유지보수에 와따
+    
+}
 
-
- */
