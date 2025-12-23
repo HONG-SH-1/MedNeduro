@@ -129,7 +129,7 @@ public class ServiceLogin {
 
         return "SUCCESS";
     }
-
+    // MRI 리스트 (최근 분석리스트, 모달 창 선택화면)
     public List<MriListM> getMyMriList(String loginId){
         return dao.getMriList(loginId);
     }

@@ -164,22 +164,37 @@
 
 <!-- 이하 최근 분석 기록 -->
 <div id="recentDrawerOverlay" class="drawer-overlay"></div>
+
 <div id="recentDrawer" class="side-drawer">
     <div class="drawer-header">
         <h3>최근 분석 기록</h3>
         <button id="btnCloseDrawer" class="close-drawer-btn">&times;</button>
     </div>
+
     <div class="drawer-body">
-        <ul class="recent-list">
-            <%-- 여기에 Controller 단에서 데이터 가져와서 출력하여  --%>
-            <li class="recent-item">
-                <div class="ri-header">
-                    <span class="ri-name">김철수 (M/45)</span>
-                    <span class="ri-badge">의사명</span>
-                </div>
-                <div class="ri-info">Brain T1 Sequence</div>
-                <div class="ri-date">2023.12.19 14:30</div>
-            </li>
+        <ul class="recent-list" id="recentList">
+
+            <c:forEach var="log" items="${recentLogs}">
+                <li class="recent-item" data-filepath="${log.fileName}">
+                    <div class="ri-header">
+                        <span class="ri-name">${log.patientName} (${log.gender})</span>
+                    </div>
+                    <div class="ri-info">
+                        MRI ID: ${log.medMriId}
+                    </div>
+                    <div class="ri-date">
+                            ${log.uploadDt}
+                        <c:if test="${not empty log.lastCheckTime}">
+                            <span style="color:green; font-size:0.8em;">(최근: ${log.lastCheckTime})</span>
+                        </c:if>
+                    </div>
+                </li>
+            </c:forEach>
+
+            <c:if test="${empty recentLogs}">
+                <li style="padding:20px; text-align:center;">최근 분석 기록이 없습니다.</li>
+            </c:if>
+
         </ul>
     </div>
 </div>

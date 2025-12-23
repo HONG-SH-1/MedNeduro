@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 
 // 푸쉬테스트 # 작성자 변운조
 @Controller
@@ -70,7 +72,22 @@ public class ControllerLogin {
 
     // 페이지 이동 매핑 유지 -> 뷰 매핑
     @GetMapping("maindoctorpage")
-    public String maindoctorpage(Model d) {
+    public String maindoctorpage(Model d, HttpSession session) {
+
+        // 1. 세션에서 로그인한 의사 ID 가져오기
+        String loginId = (String) session.getAttribute("id");
+
+        // 2. 로그인 상태라면 리스트 조회
+        if (loginId != null) {
+            // Service에 있는 getMyMriList 메서드 호출
+            List<MriListM> list = service.getMyMriList(loginId);
+
+            // 3. 모델에 담기 (이름: "recentLogs")
+            // 이제 JSP에서 ${recentLogs}로 사용할 수 있게 됩니다.
+            d.addAttribute("recentLogs", list);
+
+            System.out.println("조회된 리스트 개수: " + list.size()); // (로그 확인용)
+        }
 
         return "z01_Project/Minsu_page/maindoctor";
     }

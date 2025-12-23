@@ -772,3 +772,74 @@ document.addEventListener('DOMContentLoaded', function() {
     renderList(patientData); // 1. 리스트 만들기
     openModal();             // 2. 모달 띄우기 (자동)
 });
+
+// 최근 분석 리스트 API 연동
+
+// .recent-item을 클릭했을 때 실행
+$(document).on('click', '.recent-item', function() {
+
+    // 1. 숨겨진 경로 꺼내기 (JSP에서 넣은 data-filepath)
+    const filePath = $(this).data('filepath');
+
+    // 2. 경로가 있으면 서버에 로드 요청
+    if (filePath) {
+        // 드로어 닫기
+        $('#recentDrawer').removeClass('open');
+        $('#recentDrawerOverlay').removeClass('show');
+
+        // ★ 자바(load-local) 호출!
+        loadServerFile(filePath);
+    } else {
+        alert("파일 경로가 없습니다.");
+    }
+});
+/**
+ * ✅ 서버에 있는 파일 경로로 로드하기 (핵심 엔진)
+ * filePath: "/home/test/brain.nii" 같은 서버 절대 경로
+ */
+function loadServerFile(filePath) {
+    console.log("서버 파일 로딩 요청 시작:", filePath);
+
+    // 1. 자바(백엔드)에게 요청 (AJAX)
+    $.ajax({
+        url: `${API_BASE}/load-local`, // Controller의 /load-local 주소
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ filePath: filePath }), // { "filePath": "..." }
+
+        // 2. 성공 시
+        success: function (res) {
+            if (!res.ok) {
+                alert("파일 로드 실패: " + res.message);
+                return;
+            }
+
+            // 서버가 발급해준 ID와 파일명
+            const fileId = res.fileId;
+            const fileName = res.originalName;
+
+            console.log(`로딩 성공! ID: ${fileId}`);
+
+            // 3. 뷰어 실행 (기존 로직 재사용)
+            createSession(fileId, fileName);
+            setActiveSession(fileId);
+
+            openTools();
+            show2DView();
+
+            // UI 정리
+            $("#layoutRoot").removeClass("upload-mode");
+            $("#analysis2DView").removeClass("thumbs-collapsed").addClass("thumbs-open");
+            $("#btnThumbToggle").text("▲");
+            $("#viewerTitle").text("축(Axis)을 선택해주세요");
+
+            alert("파일이 로드되었습니다. 왼쪽에서 축(Axial 등)을 클릭하세요!");
+        },
+
+        // 3. 에러 시
+        error: function (xhr) {
+            console.error(xhr);
+            alert("서버 연결 에러: " + (xhr.responseText || xhr.statusText));
+        }
+    });
+}
