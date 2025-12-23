@@ -6,163 +6,147 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 <fmt:requestEncoding value="UTF-8"/>
+
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>MadNeduro Login</title>
+    <title>MedNeuro - Login</title>
     <link rel="stylesheet" href="/com/bootstrap.min.css">
+
     <style>
-        /* 1. 전체 배경 설정 */
+        /* [변수 설정] */
+        :root {
+            --bg-dark: #121212;
+            --panel-dark: #1E1E1E;
+            --input-bg: #2C2C2E;
+            --border-color: #3A3A3C;
+            --primary-color: #4D79FF; /* MedNeuro 메인 블루 */
+            --text-main: #FFFFFF;
+            --text-sub: #A0A0A0;
+        }
+
+        /* [전체 초기화 및 배경] */
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             overflow: hidden;
-            background-image: url("/images/req2.png");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.6); /* 60% 어둡게 */
-            backdrop-filter: blur(5px);      /* 배경 흐림 효과 */
-            z-index: -1;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        .login-card {
-            width: 900px;  /* 카드의 전체 너비 */
-            height: 550px; /* 카드의 전체 높이 */
-            background-color: #1a1a1a;
-            border-radius: 20px; /* 둥근 모서리 */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8); /* 깊은 그림자 */
-            display: flex; /* 좌우 분할 */
-            overflow: hidden; /* 자식 요소가 둥근 모서리를 넘치지 않게 */
-            border: 1px solid rgba(255,255,255,0.1);
+        /* [메인 컨테이너] */
+        .auth-container {
+            width: 90%; max-width: 1000px; height: 600px;
+            background: var(--panel-dark);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            display: flex; overflow: hidden;
+            border: 1px solid #333;
         }
 
-        .card-left {
-            width: 50%;
-            padding: 50px;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        /* [왼쪽: 브랜딩 배너] */
+        .auth-banner {
+            flex: 0.5; /* 50% 너비 */
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             position: relative;
+            display: flex; flex-direction: column;
+            justify-content: center; padding: 60px;
+            color: white; overflow: hidden;
         }
 
-        .card-left::after {
-            content: "";
-            position: absolute;
-            top: -50px; left: -50px;
-            width: 200px; height: 200px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 50%;
+        /* 배경 이미지 오버레이 */
+        .auth-banner::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('${path}/images/req2.png'); /* 기존 배경 활용 */
+            background-size: cover; background-position: center;
+            opacity: 0.3; z-index: 1; mix-blend-mode: overlay;
         }
 
-        .brand-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #E5F2F2;
-        }
+        .banner-content { position: relative; z-index: 2; text-align: left; }
+        .brand-logo { font-size: 3rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -1px; }
+        .brand-slogan { font-size: 1.2rem; font-weight: 300; color: #ccc; line-height: 1.6; margin-bottom: 40px; }
 
-        .brand-desc {
-            font-size: 1rem;
-            color: #aaa;
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
-
+        /* 기능 리스트 아이콘 스타일 */
         .feature-list { list-style: none; padding: 0; }
-        .feature-list li {
-            margin-bottom: 15px;
-            font-size: 0.95rem;
-            color: #ccc;
-            display: flex;
-            align-items: center;
-        }
+        .feature-list li { margin-bottom: 12px; font-size: 1rem; color: #ddd; display: flex; align-items: center; }
         .feature-list li::before {
-            content: "✔";
-            margin-right: 10px;
-            color: #0d6efd;
-            font-weight: bold;
+            content: "✓"; margin-right: 12px; color: var(--primary-color);
+            font-weight: bold; font-size: 1.1rem;
         }
 
-        .card-right {
-            width: 50%;
+        /* [오른쪽: 로그인 폼] */
+        .auth-form-wrapper {
+            flex: 0.5; /* 50% 너비 */
+            background-color: var(--panel-dark);
+            display: flex; flex-direction: column; justify-content: center;
             padding: 50px;
-            background-color: #1a1a20;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
 
-        .login-header {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 30px;
+        .form-header { margin-bottom: 30px; text-align: left; }
+        .form-header h2 { font-size: 2rem; font-weight: bold; margin-bottom: 8px; }
+        .form-header p { color: var(--text-sub); margin: 0; font-size: 0.95rem; }
+
+        /* [탭 스타일] */
+        .nav-tabs { border-bottom: 2px solid #333; margin-bottom: 25px; }
+        .nav-tabs .nav-link {
+            color: var(--text-sub); border: none; background: transparent;
+            font-weight: 600; padding: 10px 20px; transition: all 0.3s;
         }
+        .nav-tabs .nav-link:hover { color: white; }
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color) !important;
+            background: transparent;
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: -2px; /* 라인 겹치기 */
+        }
+
+        /* [입력 필드] */
+        .form-label { display: none; } /* 모던한 느낌을 위해 라벨 숨김 (placeholder 활용) */
 
         .form-control {
-            background-color: #2b2b3b;
-            border: 1px solid #444;
-            color: white;
-            height: 45px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: white; height: 50px;
+            border-radius: 8px; font-size: 1rem; padding: 0 15px;
+            margin-bottom: 15px; transition: all 0.3s;
         }
         .form-control:focus {
-            background-color: #333344;
-            color: white;
-            border-color: #0d6efd;
-            box-shadow: none;
+            background-color: #38383a;
+            border-color: var(--primary-color);
+            color: white; box-shadow: 0 0 0 3px rgba(77, 121, 255, 0.2);
         }
-        .form-label { color: #ccc; font-size: 0.9rem;}
+        .form-control::placeholder { color: #666; }
 
-        /* 탭 스타일 커스텀 */
-        .nav-tabs { border-bottom: 1px solid #444; margin-bottom: 20px; }
-        .nav-tabs .nav-link {
-            color: #888;
-            border: none;
-            background: transparent;
+        /* [버튼] */
+        .btn-login {
+            width: 100%; height: 50px;
+            background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+            transition: filter 0.2s;
         }
-        .nav-tabs .nav-link.active {
-            color: white !important;
-            background-color: #2b2b3b;
-            border-radius: 5px 5px 0 0;
-            font-weight: bold;
-            border: 1px solid #444;
-            border-bottom: none;
-        }
+        .btn-login:hover { filter: brightness(1.1); }
 
-        /* 반응형: 화면이 작아지면 세로로 배치 */
-        @media (max-width: 900px) {
-            .login-card { width: 90%; height: auto; flex-direction: column; }
-            .card-left { width: 100%; padding: 30px; height: 200px; }
-            .card-right { width: 100%; padding: 30px; }
-            .feature-list { display: none; } /* 모바일에서 리스트 숨김 */
-        }
+        .auth-footer { margin-top: 30px; text-align: center; color: var(--text-sub); font-size: 0.9rem; }
+        .link-signup { color: var(--primary-color); text-decoration: none; font-weight: bold; margin-left: 5px; cursor: pointer; }
+        .link-signup:hover { text-decoration: underline; }
+
     </style>
+
     <script src="/com/jquery-3.7.1.js"></script>
     <script src="/com/bootstrap.min.js"></script>
     <script type="text/javascript">
         function setType(type) {
             $("#userType").val(type);
-
             $(".nav-link").removeClass("active");
+
+            // 탭 활성화 로직
             if(type === 'general') {
-                $(".nav-link").eq(0).addClass("active");
+                $("#tab-gen").addClass("active");
             } else {
-                $(".nav-link").eq(1).addClass("active");
+                $("#tab-doc").addClass("active");
             }
         }
 
@@ -195,30 +179,35 @@
 
 <body>
 
-<div class="login-card">
+<div class="auth-container">
 
-    <div class="card-left">
-        <div class="brand-title">MadNeduro</div>
-        <p class="brand-desc">
-            환자 관리을 위한<br>
-            통합 의료 정보 시스템
-        </p>
-        <ul class="feature-list">
-            <li>환자 의료 기록 관리</li>
-            <li>AI 기반 진단 보조</li>
-            <li>안전한 데이터 보안</li>
-        </ul>
+    <div class="auth-banner">
+        <div class="banner-content">
+            <div class="brand-logo">MedNeuro</div>
+            <p class="brand-slogan">
+                모든 사람을 위한<br>
+                MRI 의료 정보 시스템
+            </p>
+            <ul class="feature-list">
+                <li>환자 의료 기록 관리</li>
+                <li>AI 기반 진단 보조</li>
+                <li>안전한 데이터 보안</li>
+            </ul>
+        </div>
     </div>
 
-    <div class="card-right">
-        <div class="login-header">Login</div>
+    <div class="auth-form-wrapper">
+        <div class="form-header">
+            <h2>로그인</h2>
+            <p>로그인 정보를 입력해주세요</p>
+        </div>
 
-        <ul class="nav nav-tabs nav-fill" id="loginTab">
+        <ul class="nav nav-tabs nav-fill">
             <li class="nav-item">
-                <a class="nav-link active" onclick="setType('general')">일반 회원</a>
+                <a class="nav-link active" id="tab-gen" onclick="setType('general')" href="#">일반 회원</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" onclick="setType('doctor')">의사 회원</a>
+                <a class="nav-link" id="tab-doc" onclick="setType('doctor')" href="#">의사 회원</a>
             </li>
         </ul>
 
@@ -227,19 +216,21 @@
             <input type="hidden" name="userType" id="userType" value="general">
 
             <div class="mb-3">
-                <label class="form-label">아이디</label>
-                <input type="text" name="id" class="form-control" placeholder="아이디를 입력하세요">
+                <input type="text" name="id" class="form-control" placeholder="아이디">
             </div>
 
             <div class="mb-4">
-                <label class="form-label">비밀번호</label>
-                <input type="password" name="pwd" class="form-control" placeholder="비밀번호를 입력하세요">
+                <label class="form-label" for="pwd">비밀번호</label>
+                <input id="pwd" type="password" name="pwd" class="form-control" placeholder="비밀번호">
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 py-2">로그인</button>
+            <button type="submit" class="btn-login">로그인</button>
         </form>
 
-        <button id="reg-btn" type="button" class="btn btn-outline-secondary w-100 mt-3 py-2">회원가입</button>
+        <div class="auth-footer">
+            계졍이 없으신가요?
+            <span id="reg-btn" class="link-signup">회원 가입 하기</span>
+        </div>
     </div>
 
 </div>
