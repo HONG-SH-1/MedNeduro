@@ -287,9 +287,15 @@ public class ModelController {
         // Path : 주소를 나타내는 객체
         // Paths.get(문자열) : 글자로 된 주소를 자바가 이해하는 네비게이션 주소로 바꿔주는 기능입니다.
         // 단순 글자(String)일 때는 기능이 없음, Path 전환하면 복사, 이동, 삭제 명령어 가능..
+    if (!source.isAbsolute()){
+        source = Paths.get(uploadDir, filePath);
+    }
+    // C:/ 같은 경로가 아니라면 -> 업로더 폴더 경로를 앞에 붙여줌.
+
     if (!Files.exists(source)){
         // Files.exists(...) 주소지에 건물이 진짜 있는지 확인하는 기능입니다. 있으면 true 없으면 false를 반환
-        return Map.of("ok", false, "message","파일이 서버에 없습니다 :" + filePath);
+        // return Map.of("ok", false, "message","파일이 서버에 없습니다 :" + filePath);
+        return Map.of("ok", false, "message","파일이 서버에 없습니다 :" + source.toString());
     }
     String fileId = UUID.randomUUID().toString().replace("-","");
     /*
