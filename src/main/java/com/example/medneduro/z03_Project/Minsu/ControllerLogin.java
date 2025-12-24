@@ -30,13 +30,18 @@ public class ControllerLogin {
                                @RequestParam(name="pwd", defaultValue = "") String pwd,
                                @RequestParam(name="userType", defaultValue = "") String userType,
                                Model d, HttpSession session) {
+        // .isEmpty()는 문자열의 길이가 0인지 확인 -> ""(빈 문자열)인지 확인
+        // 내부적으로는 str.length() == 0 와 동일!
         if (id == null || id.trim().isEmpty() || pwd == null || pwd.trim().isEmpty()) {
+            // null 체크를 먼저 하는 이유로는 문자열이 null 인 상태로 호출하면 NullPointerException가 발생!
+            // 따라서 이렇게 순서로 체크 혹은 공백까지 제거!
             d.addAttribute("msg","아이디와 비밀번호를 모두 입력해주세요!");
             return "z01_Project/Minsu_page/login";
         }
         // 서비스단에서 비밀번호 대조 후 그 값을 컨트롤 단으로 다시 불러서 확인!
-        //
+        // matches()의 결과값 true/false를 여기서 받음
         if (service.logincheck(userType, id, pwd)) {
+            // [인증 성공] 세션에 증표 젖아(비밀번호는 저장 x!!!!)
             session.setAttribute("userType", userType);
             session.setAttribute("id", id);
             /*
@@ -64,7 +69,7 @@ public class ControllerLogin {
                 return "redirect:/maindoctorpage";
             }
         } else {
-            d.addAttribute("msg", "아이디 혹은1 비밀번호가 틀렸습니다 다시 로그인 해주세요.");
+            d.addAttribute("msg", "아이디 혹은 비밀번호가 틀렸습니다 다시 로그인 해주세요.");
             return "z01_Project/Minsu_page/login";
         }
         return "z01_Project/Minsu_page/login";

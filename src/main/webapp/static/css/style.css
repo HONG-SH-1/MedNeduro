@@ -205,7 +205,7 @@ body{
 
 /* ✅ 접은 상태 */
 .layout.tools-collapsed{
-  grid-template-columns: var(--iconbar-w) 0px 1fr var(--rightbar-w);
+  grid-template-columns: var(--iconbar-w) 0 1fr var(--rightbar-w);
 }
 
 /* ✅ (수정 1) layoutRoot 1행: 탭바 */
@@ -864,76 +864,104 @@ body{
     transform: translateY(-1px); /* 살짝 떠오르는 효과 (선택사항) */
 }
 
-
-/* ✅ 사이드바(Drawer) 스타일 */
+/* [사이드바 서랍: 디스코드 배경색 적용] */
 .side-drawer {
     position: fixed;
-    top: 0;
-    right: -320px; /* 처음에 화면 밖 오른쪽으로 숨김 */
+    top: 0; right: -320px; /* 너비 약간 줄임 (디스코드 패널 느낌) */
     width: 320px;
     height: 100%;
-    background: #1e1e1e; /* 어두운 배경 */
-    color: #fff;
-    z-index: 2000; /* 모달보다 위에 뜨도록 */
-    transition: right 0.3s ease-in-out; /* 부드럽게 스르륵 */
-    box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+    background-color: #151515; /* 디스코드 사이드바 배경색 */
+    box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+    transition: right 0.2s ease-in-out; /* 빠릿한 반응속도 */
+    z-index: 2000;
     display: flex;
     flex-direction: column;
 }
 
-/* JS가 이 클래스를 붙이면 화면 안으로 튀어나옴 */
-.side-drawer.open {
-    right: 0;
-}
+.side-drawer.open { right: 0; }
 
-/* 배경 어둡게 하는 오버레이 */
-.drawer-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1999;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s;
-}
-.drawer-overlay.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* 헤더 & 바디 스타일 */
+/* [헤더: 검색창 느낌 내기] */
 .drawer-header {
-    padding: 15px;
-    background: #333;
+    height: 48px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid #202225; /* 헤더 구분선 */
+    background-color: #2F3136;
 }
+
+.drawer-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #F2F3F5; /* 제목 흰색 */
+}
+
+.close-drawer-btn {
+    background: none; border: none;
+    color: #B9BBBE; font-size: 1.5rem; cursor: pointer;
+}
+.close-drawer-btn:hover { color: #DCDDDE; }
+
+/* [리스트 영역] */
 .drawer-body {
     flex: 1;
-    overflow-y: auto; /* 내용 많으면 스크롤 */
-    padding: 10px;
-    -ms-overflow-style: none;
-}
-.close-drawer-btn {
-    background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;
+    padding: 8px; /* 디스코드는 패딩이 좁음 */
+    overflow-y: auto;
 }
 
-/* 리스트 아이템 스타일 */
+
+.drawer-body::-webkit-scrollbar { width: 8px; background-color: #2E3338; }
+.drawer-body::-webkit-scrollbar-thumb { background-color: #202225; border-radius: 4px; }
+
+
+.recent-list { list-style: none; padding: 0; margin: 0; }
+
 .recent-item {
-    background: #2a2a2a;
-    margin-bottom: 15px;
-    padding: 10px;
-    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 2px; /* 아이템 간격 좁게 */
+    border-radius: 4px; /* 살짝 둥근 모서리 */
     cursor: pointer;
-    border: 1px solid #444;
+    transition: background-color 0.1s;
+    color: #B9BBBE; /* 기본 글자색 (회색) */
 }
+
+/* 마우스 올렸을 때 (Hover) */
 .recent-item:hover {
-    background: #444;
-    border-color: #007bff;
+    background-color: #30333A; /* 호버 시 밝은 회색 */
+    color: #DCDDDE; /* 글자색 밝게 */
 }
-.recent-list{
-    list-style: none;
-    list-style-position:inside;
-    padding-left: 10px;
+.recent-item:hover .ri-name { color: #FFFFFF; } /* 이름은 완전 흰색으로 */
+
+/* [2. 텍스트 영역] */
+.ri-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden; /* 긴 글자 자르기 */
 }
+
+.ri-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.ri-sub {
+    font-size: 0.75rem;
+    color: #B9BBBE; /* 서브 텍스트 회색 */
+    display: flex; gap: 5px;
+}
+
+/* [오버레이] */
+.drawer-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 1999;
+    opacity: 0; visibility: hidden; transition: 0.3s;
+}
+.drawer-overlay.show { opacity: 1; visibility: visible; }

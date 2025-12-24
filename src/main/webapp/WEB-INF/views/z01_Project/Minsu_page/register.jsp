@@ -6,152 +6,175 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 <fmt:requestEncoding value="UTF-8"/>
+
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>MadNeduro - 회원가입</title>
+    <title>MedNeuro - Create Account</title>
     <link rel="stylesheet" href="/com/bootstrap.min.css">
+
     <style>
-        /* [전체 레이아웃] */
+        /* [변수 설정] */
+        :root {
+            --bg-dark: #121212;
+            --panel-dark: #1E1E1E;
+            --input-bg: #2C2C2E;
+            --border-color: #3A3A3C;
+            --primary-color: #4D79FF; /* MedNeuro 메인 블루 */
+            --text-main: #FFFFFF;
+            --text-sub: #A0A0A0;
+        }
+
+        /* [전체 레이아웃 초기화] */
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            font-family: 'Noto Sans KR', sans-serif;
-            background-image: url("/images/main2.png");
-            background-size: cover; background-position: center; background-repeat: no-repeat;
-            overflow: hidden; /* 배경 스크롤 방지 */
-        }
-
-        body::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7); z-index: -1;
-        }
-
-        #main {
-            width: 100%; height: 100vh;
+            font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden; /* 전체 스크롤 방지 */
             display: flex; justify-content: center; align-items: center;
-            padding: 20px;
         }
 
-        /* [세로형 카드 컨테이너] */
-        .register-card {
-            display: flex;
-            flex-direction: column; /* ★ 세로 배치 핵심 */
-            width: 500px; /* 너비를 좁혀서 세로형에 맞게 조정 */
-            height: 90vh; /* 화면 높이의 90% 사용 */
-            max-height: 850px;
-            background-color: #1a1a1a;
+        /* [메인 컨테이너: 분할 화면] */
+        .auth-container {
+            width: 90%; max-width: 1200px; height: 85vh;
+            background: var(--panel-dark);
             border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            display: flex; overflow: hidden;
+            border: 1px solid #333;
         }
 
-        /* [상단 패널: 브랜드 정보] */
-        .card-top {
-            width: 100%;
-            height: 20%; /* 높이 비율 조정 */
-            background: linear-gradient(145deg, #1a2a3a 0%, #121f28 100%);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center; /* 가운데 정렬 */
-            text-align: center;
-            color: white;
+        /* [왼쪽: 브랜딩 배너 영역] */
+        .auth-banner {
+            flex: 0.45; /* 45% 너비 */
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             position: relative;
-            flex-shrink: 0; /* 크기 줄어들지 않게 고정 */
+            display: flex; flex-direction: column;
+            justify-content: space-between; padding: 60px;
+            color: white; overflow: hidden;
         }
 
-        .card-top h1 { font-size: 2rem; font-weight: bold; margin-bottom: 10px; color: #fff; }
-        .card-top p { color: #aab8c2; font-size: 0.9rem; margin: 0; }
-
-        .feature-list { display: none; } /* 세로형에서는 공간 부족으로 리스트 숨김 (선택사항) */
-
-        /* [하단 패널: 입력 폼] */
-        .card-bottom {
-            width: 100%;
-            height: 75%; /* 나머지 높이 */
-            background-color: #1a1a1a;
-            padding: 30px 40px;
-            display: flex;
-            flex-direction: column;
-
-            /* ★ 스크롤 설정 (중요) */
-            overflow-y: auto;
-            -ms-overflow-style: none; /* IE, Edge 스크롤바 숨기기 */
-            scrollbar-width: none; /* Firefox 스크롤바 숨기기 */
+        /* 배경 이미지 오버레이 (선택사항: 이미지가 있다면 url 변경) */
+        .auth-banner::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('${path}/images/req2.png'); /* 기존 배경 이미지 활용 */
+            background-size: cover; background-position: center;
+            opacity: 0.4; z-index: 1; mix-blend-mode: overlay;
         }
 
-        /* Chrome, Safari, Opera 스크롤바 숨기기 */
-        .card-bottom::-webkit-scrollbar { display: none; }
+        .banner-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; }
+        .brand-logo { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+        .brand-desc { font-size: 1.1rem; color: #ccc; font-weight: 300; }
+        .brand-footer { margin-top: auto; font-size: 0.9rem; color: rgba(255,255,255,0.5); }
 
-        .form-header { margin-bottom: 20px; text-align: center; }
-        .form-header h2 { color: white; font-weight: bold; font-size: 1.5rem; }
+        /* [오른쪽: 입력 폼 영역] */
+        .auth-form-wrapper {
+            flex: 0.55; /* 55% 너비 */
+            background-color: var(--panel-dark);
+            display: flex; flex-direction: column;
+            padding: 40px 60px;
+            overflow-y: auto; /* ★ 세로 스크롤 허용 */
+        }
 
-        /* [입력 필드 스타일] */
-        .form-label { color: #ccc; font-size: 0.85rem; margin-bottom: 5px; }
+        /* 스크롤바 디자인 */
+        .auth-form-wrapper::-webkit-scrollbar { width: 6px; }
+        .auth-form-wrapper::-webkit-scrollbar-thumb { background-color: #333; border-radius: 3px; }
+        .auth-form-wrapper::-webkit-scrollbar-track { background-color: transparent; }
+
+        .form-header { margin-bottom: 30px; }
+        .form-header h2 { font-size: 2rem; font-weight: bold; margin-bottom: 10px; }
+        .form-header p { color: var(--text-sub); margin: 0; }
+
+        /* [입력 필드 커스텀 스타일] */
+        .form-label { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 6px; font-weight: 500; }
+
         .form-control {
-            background-color: #2b2b3b;
-            border: 1px solid #444;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
             color: white;
-            height: 40px; /* 높이 약간 줄임 */
-            border-radius: 5px;
-            font-size: 0.9rem;
+            padding: 12px 15px; border-radius: 8px; font-size: 0.95rem;
+            transition: all 0.3s;
         }
         .form-control:focus {
-            background-color: #333344;
-            color: white;
-            border-color: #0d6efd;
-            box-shadow: none;
+            background-color: #38383a;
+            border-color: var(--primary-color);
+            color: white; box-shadow: 0 0 0 2px rgba(77, 121, 255, 0.2);
         }
+        .form-control::placeholder { color: #555; }
 
-        /* [탭 스타일] */
+        /* [회원 유형 탭] */
         .user-type-selector {
-            display: flex;
-            background-color: #2b2b3b;
-            border-radius: 5px;
-            padding: 4px;
-            margin-bottom: 20px;
+            display: flex; background-color: var(--input-bg);
+            border-radius: 8px; padding: 4px; margin-bottom: 25px;
+            border: 1px solid var(--border-color);
         }
         .user-type-selector input[type="radio"] { display: none; }
         .user-type-selector label {
-            flex: 1; text-align: center; padding: 8px 0; cursor: pointer;
-            border-radius: 5px; color: #888; font-weight: 500; transition: all 0.3s;
-            font-size: 0.9rem;
+            flex: 1; text-align: center; padding: 10px 0; cursor: pointer;
+            border-radius: 6px; color: var(--text-sub); font-weight: 600; font-size: 0.95rem;
+            transition: all 0.3s;
         }
         .user-type-selector input[type="radio"]:checked + label {
-            background-color: #404050; color: white; font-weight: bold;
+            background-color: #404042; color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         /* [버튼 스타일] */
-        .btn-primary-custom {
-            background-color: #0d6efd; border: none; color: white; font-weight: bold;
-            height: 45px; border-radius: 5px; width: 100%; margin-top: 20px;
+        .btn-auth-primary {
+            width: 100%; padding: 14px;
+            background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+            transition: filter 0.2s;
         }
-        .btn-primary-custom:hover { background-color: #0b5ed7; }
+        .btn-auth-primary:hover { filter: brightness(1.1); }
 
         .btn-check-custom {
-            background-color: #444; border: 1px solid #555; color: white; font-size: 0.8rem;
+            background-color: #3A3A3C; color: #ddd; border: 1px solid var(--border-color);
+            border-radius: 0 8px 8px 0; transition: 0.2s;
         }
-        .btn-cancel {
-            background-color: transparent; border: 1px solid #444; color: #aaa;
-            height: 45px; border-radius: 5px; width: 100%; margin-top: 10px;
-        }
-        .btn-cancel:hover { background-color: #222; color: white; }
+        .btn-check-custom:hover { background-color: #555; color: white; }
 
-        .terms-box {
-            background-color: #1f1f25; border: 1px solid #333; color: #aaa;
-            padding: 10px; border-radius: 5px; height: 80px; overflow-y: auto;
-            font-size: 0.8rem; margin-bottom: 10px;
-            -ms-overflow-style: none; scrollbar-width: none;
+        .btn-cancel {
+            width: 100%; padding: 14px; background: transparent;
+            border: 1px solid var(--border-color); color: var(--text-sub);
+            border-radius: 8px; font-weight: 600; margin-top: 10px;
+            transition: 0.2s;
         }
-        .terms-box::-webkit-scrollbar { display: none; }
+        .btn-cancel:hover { border-color: #666; color: white; }
+
+        /* [약관 박스] */
+        .terms-box {
+            background-color: var(--input-bg); border: 1px solid var(--border-color);
+            color: var(--text-sub); padding: 15px; border-radius: 8px;
+            font-size: 0.85rem; height: 100px; overflow-y: auto; margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        /* [유틸] */
+        .text-accent { color: var(--primary-color); cursor: pointer; text-decoration: none; }
+        .d-none-custom { display: none; }
+
+        #checkBtn{
+            font-size: 13px;
+        }
+        .terms-box::-webkit-scrollbar{
+          display: none;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
+
     <script src="/com/jquery-3.7.1.js"></script>
     <script src="/com/bootstrap.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
+            // [기존 로직 유지]
             var isIdChecked = false;
             $("input[name='id']").on("input",function(){ isIdChecked = false; })
 
@@ -169,13 +192,15 @@
                 $(this).val(val);
             });
 
+            // 의사/일반 회원 토글 애니메이션 적용
             $("input[name='userType']").change(function(){
                 if($(this).val() == 'doctor') {
-                    $("#doctorFields").slideDown();
+                    $("#doctorFields").slideDown(300);
                 } else {
-                    $("#doctorFields").slideUp();
-                    $("input[name='licenseNo']").val("");
-                    $("input[name='deptId']").val("");
+                    $("#doctorFields").slideUp(300, function(){
+                        $("input[name='licenseNo']").val("");
+                        $("input[name='deptId']").val("");
+                    });
                 }
             });
 
@@ -211,9 +236,9 @@
 
                 if(confirm("가입하시겠습니까?")){ $("form").submit(); }
             });
-
-            $("#cancelBtn").click(function(){ location.href = "${path}/loginpage"; });
-            var msg = "${msg}"; if(msg != ""){ alert(msg); }
+            // 취소 버튼 삭제 ;; 12월 23일
+            <%--$("#cancelBtn").click(function(){ location.href = "${path}/loginpage"; });--%>
+            <%--var msg = "${msg}"; if(msg != ""){ alert(msg); }--%>
 
             $("#checkBtn").click(function(){
                 var id = $("input[name='id']").val();
@@ -233,95 +258,109 @@
 </head>
 
 <body>
-<div id="main">
+<div class="auth-container">
 
-    <div class="register-card">
-        <div class="card-top">
-            <h1>MadNeduro</h1>
-            <p>MRI 3D 의료 정보 시스템</p>
+    <div class="auth-banner">
+        <div class="banner-content">
+            <div>
+                <div class="brand-logo">MedNeuro</div>
+                <div class="brand-desc">MRI 3D 의료 정보 시스템</div>
+            </div>
+            <div class="brand-footer">
+                &copy; 2025 MedNeuro. All Rights Reserved.
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-form-wrapper">
+        <div class="form-header">
+            <h2>회원 가입</h2>
+            <p>회원 정보를 입력해주세요.</p>
         </div>
 
-        <div class="card-bottom">
+        <form action="" method="post">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
-            <form action="" method="post">
-                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <div class="user-type-selector">
+                <input type="radio" name="userType" id="type_gen" value="general" checked>
+                <label for="type_gen">일반 회원</label>
 
-                <div class="user-type-selector">
-                    <input type="radio" name="userType" id="type_gen" value="general" checked>
-                    <label for="type_gen">일반 회원</label>
+                <input type="radio" name="userType" id="type_doc" value="doctor">
+                <label for="type_doc">의사 회원</label>
+            </div>
 
-                    <input type="radio" name="userType" id="type_doc" value="doctor">
-                    <label for="type_doc">의사 회원</label>
-                </div>
-
-                <div id="doctorFields" style="display: none;">
-                    <div class="mb-3">
+            <div id="doctorFields" style="display: none;">
+                <div class="row mb-3">
+                    <div class="col-6">
                         <label class="form-label">의사 면허 번호</label>
-                        <input type="text" name="licenseNo" class="form-control" placeholder="면허 번호 입력">
+                        <input type="text" name="licenseNo" class="form-control" placeholder="의사 면허 번호">
                     </div>
-                    <div class="mb-3">
+                    <div class="col-6">
                         <label class="form-label">부서 번호</label>
-                        <input type="number" name="deptId" class="form-control" placeholder="부서 번호 입력 (숫자)">
+                        <input type="number" name="deptId" class="form-control" placeholder="부서 번호" step="10" max="100" min="0">
                     </div>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label">아이디</label>
-                    <div class="input-group">
-                        <input type="text" name="id" class="form-control" placeholder="아이디 입력" style="border-radius: 5px 0 0 5px;">
-                        <button type="button" id="checkBtn" class="btn btn-check-custom" style="border-radius: 0 5px 5px 0;">중복확인</button>
-                    </div>
+            <div class="mb-3">
+                <label class="form-label">아이디</label>
+                <div class="input-group">
+                    <input type="text" name="id" class="form-control" placeholder="ID" style="border-right: 0;">
+                    <button type="button" id="checkBtn" class="btn btn-check-custom">중복확인</button>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label">비밀번호</label>
-                    <input type="password" name="pwd" class="form-control" placeholder="비밀번호 입력">
+            <div class="mb-3">
+                <label class="form-label">비밀번호</label>
+                <input type="password" name="pwd" class="form-control" placeholder="비밀번호를 입력해주세요.">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">비밀번호 확인</label>
+                <input type="password" id="pwd2" class="form-control" placeholder="비밀번호를 다시 입력해주세요.">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">이름</label>
+                <input type="text" name="name" class="form-control" placeholder="이름">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">주민등록번호</label>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="text" name="birthDate" class="form-control text-center" maxlength="8" placeholder="생년월일(8자리)">
+                    <span style="color:#555">─</span>
+                    <input type="text" name="gender" class="form-control text-center" maxlength="1" placeholder="●" >
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label">비밀번호 확인</label>
-                    <input type="password" id="pwd2" class="form-control" placeholder="비밀번호 재입력">
+            <div class="mb-3">
+                <label class="form-label">휴대전화번호</label>
+                <input type="text" name="phoneNumber" class="form-control" maxlength="13" placeholder="010-0000-0000">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-warning">약관 동의</label>
+                <div class="terms-box">
+                    1. 수집 항목: 이름, 아이디, 비밀번호, 주민번호, 연락처<br>
+                    2. 목적: 본인 확인 및 진료 예약 시스템 활용<br>
+                    3. 보유 기간: 회원 탈퇴 시까지<br>
+                    ※ 귀하의 정보는 암호화되어 안전하게 보호됩니다.
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">이름</label>
-                    <input type="text" name="name" class="form-control" placeholder="이름 입력">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="agreeCheck" style="background-color: var(--input-bg); border-color: #555;">
+                    <label class="form-check-label" for="agreeCheck" style="color: var(--text-sub); font-size: 0.9rem;">
+                        위 약관에 동의합니다. (필수)
+                    </label>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label">주민등록번호</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="text" name="birthDate" class="form-control text-center" maxlength="8" placeholder="생년월일(8자리)">
-                        <span class="text-white">─</span>
-                        <input type="text" name="gender" class="form-control text-center" maxlength="1" placeholder="뒤 1자리" >
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">휴대전화번호</label>
-                    <input type="text" name="phoneNumber" class="form-control" maxlength="13" placeholder="숫자만 입력">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label text-warning">약관 동의</label>
-                    <div class="terms-box">
-                        1. 수집 항목: 이름, 아이디, 비밀번호, 주민번호, 연락처<br>
-                        2. 목적: 본인 확인 및 진료 예약<br>
-                        3. 보유 기간: 탈퇴 시까지<br>
-                        ※ 주민등록번호는 의료법 시행규칙에 의거하여 수집하며, 암호화되어 안전하게 저장됩니다.
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="agreeCheck">
-                        <label class="form-check-label text-white-50" for="agreeCheck">
-                            위 약관에 동의합니다. (필수)
-                        </label>
-                    </div>
-                </div>
-
-                <button type="button" id="regBtn" class="btn-primary-custom">가입하기</button>
-                <button type="button" id="cancelBtn" class="btn-cancel">취소</button>
-            </form>
-        </div>
+            <button type="button" id="regBtn" class="btn-auth-primary">회원가입</button>
+            <div class="text-center mt-3">
+                <span style="color: var(--text-sub); font-size: 0.9rem;">계정이 있으신가요?</span>
+                <a href="${path}/loginpage" class="text-accent" style="font-weight: bold; font-size: 0.9rem;">로그인 창으로 이동</a>
+            </div>
+        </form>
     </div>
 </div>
 </body>

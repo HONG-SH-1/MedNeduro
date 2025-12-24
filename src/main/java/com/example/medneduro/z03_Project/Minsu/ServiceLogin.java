@@ -50,7 +50,7 @@ public class ServiceLogin {
         /*
          5. [핵심] 암호화 전용 비교 메서드 활용 (Spring Security)
           1. 메커니즘:
-         - 스프링 시큐리티의 'BCrypt' 알고리즘을 사용하여 보안 검증을 수행함.
+         - 스프링 시큐리티의 'BCrypt' 알고리즘을 사용하여 보안 검증을 수행함. - 비크립트
           2. 내부 동작 (matches):
          - DB에 저장된 암호문에서 자동으로 'Salt(소금)' 값을 추출하여 분리함.
          - 로그인 창에 입력된 '평문 비밀번호'에 추출한 소금을 동일하게 배합함.
@@ -61,7 +61,15 @@ public class ServiceLogin {
          - 따라서 자바의 일반적인 문자열 비교(==, equals)로는 대조가 불가능함.
          - matches() 메서드만이 내부적인 솔트 추출 및 재해싱 과정을 거쳐 정확한 검증이 가능함.
          */
+        // 아래 내용이 전용 비교 메서드 passwordEncoder.matches(입력비번, DB암호문)
+        // 버전(3)-갈은 횟수(3)-솔트(22자)-해시결과값(31):체크섬
+
         return passwordEncoder.matches(pwd, encodedPassword);
+        // 새로 생성된 결과값이 db 암호문의 체크섬 부분과 일치하는지 확인
+        // true - 비밀번호 일치
+        // false - 비밀번호 x / db암호문을 임의로 수정해서 형식이 깨짐..
+        // == / .equals()를 쓰지 않는 이유로는 passwordEncoder.matches가 자동으로 처리해주기 때문에.
+
     }
 
     public int checkId(String id){
@@ -76,8 +84,9 @@ public class ServiceLogin {
 
         // 비밀번호 암호화 실행하는 로직!
         // 사용자가 입력한 생 비밀번호를 암호화 시킴.. --> 암호화 시킨 값을 DTO에 세팅하는 코드
+        // 해시와 솔트 처리..
         String securePassword = passwordEncoder.encode(reg.getPwd());
-        reg.setPwd(securePassword);
+        reg.setPwd(securePassword); // DTO에 암호화된 값을 세팅..
 
         // 2. 성별 변환
         String rawGender = reg.getGender();

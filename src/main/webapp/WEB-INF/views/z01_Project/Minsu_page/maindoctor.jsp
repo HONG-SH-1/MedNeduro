@@ -186,7 +186,7 @@
                         <span class="ri-name">${log.patientName} (${log.gender})</span>
                     </div>
                     <div class="ri-info">
-                        MRI ID: ${log.medMriId}
+                        ｜ MRI ID: ${log.medMriId} ｜
                     </div>
                     <div class="ri-date">
                             ${log.uploadDt}
