@@ -59,6 +59,7 @@
             <button id="logOutBtn" ><span class="material-symbols-outlined">Logout</span></button>
         </aside>
 
+
         <aside id="toolPanel" class="tool-panel hidden">
             <div class="tool-panel-head">Axis</div>
             <div class="tool-buttons">
