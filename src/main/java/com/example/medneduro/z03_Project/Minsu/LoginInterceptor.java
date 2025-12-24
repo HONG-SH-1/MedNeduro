@@ -32,6 +32,9 @@ public class LoginInterceptor implements HandlerInterceptor{
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception{
         HttpSession session = request.getSession();
+        String userType = (String) session.getAttribute("userType"); // 세션에 저장된 권한(doctor/general)
+        String uri = request.getRequestURI(); // 사용자가 요청한 주소 (예: /maindoctorpage)
+        // [주의] URL과 URI는 다름!!
         /*
         request.getSession()
         - 출처: request 객체 내부에서 꺼내옴
@@ -62,6 +65,32 @@ public class LoginInterceptor implements HandlerInterceptor{
             // 검문 통과 실패 및 컨트롤러 실행이 즉시 중단
             return false;
         }
-        return true;
+
+        if(uri.contains("doctor") && !"doctor".equals(userType)){
+            // 자바스크립트로 경고창을 띄우고 이전 페이지로 돌려보내기
+            response.setContentType("text/html;charset=utf-8");
+            java.io.PrintWriter out = response.getWriter();
+            out.println("<script>");
+            out.println("alert('의사 전용 메뉴입니다. 접근 권한이 없습니다.');");
+            out.println("history.back();"); // 이전 페이지(일반 페이지)로 이동
+            out.println("</script>");
+            out.flush();
+            return false;
+        }
+        if(uri.contains("general") && !"general".equals(userType)){
+            // 자바스크립트로 경고창을 띄우고 이전 페이지로 돌려보내기
+            response.setContentType("text/html;charset=utf-8");
+            java.io.PrintWriter out = response.getWriter();
+            out.println("<script>");
+            out.println("alert('일반 회원 전용 메뉴입니다. 접근 권한이 없습니다.');");
+            out.println("history.back();"); // 이전 페이지(일반 페이지)로 이동
+            out.println("</script>");
+            out.flush();
+            return false;
+        }
+
+            return true; // 모든 검문 통과시 컨트롤러로 이동!
     }
+
 }
+
