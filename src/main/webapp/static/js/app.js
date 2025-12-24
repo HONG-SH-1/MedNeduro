@@ -136,6 +136,7 @@ $(document).ready(function () {
             success: function(){
                 alert("로그아웃 되었습니다.");
                 // 로그아웃시 로그인 페이지로 이동
+                // 로그인 페이지로 이동하여 초기화 시키기!
                 location.href="/loginpage";
         },
             error: function(xhr, status, error) {
