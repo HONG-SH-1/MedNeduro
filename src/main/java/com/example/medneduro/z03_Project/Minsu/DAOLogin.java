@@ -184,26 +184,25 @@ List<MriListM> getMriList(String loginId);
     @Select("""
     SELECT 
         -- 1. MRI 파일 정보
-        m.IMAGE_FOLDER_PATH                        AS fileName, 
-        TO_CHAR(m.UPLOAD_DT, 'YYYY-MM-DD HH24:MI') AS uploadDt,
+        m.IMAGE_FOLDER_PATH                        AS fileName, -- 파일 경로
+        TO_CHAR(m.UPLOAD_DT, 'YYYY-MM-DD HH24:MI') AS uploadDt, -- 업로드 날짜
         
         -- 2. [추가된 부분] 환자 상세 정보
-        p.PATIENT_NAME                             AS patientName,
-        p.GENDER                                   AS gender,
-        p.BIRTH_DATE                               AS birthDate
+        p.PATIENT_NAME                             AS patientName, -- 환자 이름
+        p.GENDER                                   AS gender, -- 성별
+        p.BIRTH_DATE                               AS birthDate -- 생년월일
 
-    FROM MEDICAL_MRI_FOLDER m
-    
+    FROM MEDICAL_MRI_FOLDER m -- MRI 폴더를 기준으로
     -- [핵심] 환자 정보를 가져오기 위해 테이블 연결 (JOIN)
-    INNER JOIN PATIENT p ON m.PATIENT_ID = p.PATIENT_ID
+    INNER JOIN PATIENT p ON m.PATIENT_ID = p.PATIENT_ID -- 환자의 아이디로 Join
 
-    WHERE m.PATIENT_ID = (
+    WHERE m.PATIENT_ID = ( -- 선택한 환자의 아이디를 뽑아냄
         -- 서브쿼리: 파일 경로로 환자 찾기 (기존 유지)
-        SELECT sub.PATIENT_ID 
+        SELECT sub.PATIENT_ID  -- 환자의 아이디
         FROM MEDICAL_MRI_FOLDER sub 
-        WHERE sub.IMAGE_FOLDER_PATH = #{currentFilePath}
+        WHERE sub.IMAGE_FOLDER_PATH = #{currentFilePath} -- 이미지 폴더의 내가 선택한 폴더
     )
-    ORDER BY m.UPLOAD_DT DESC
+    ORDER BY m.UPLOAD_DT DESC -- 최근 검사 기록
 """)
     List<Map<String, String>> getPatientMriHistory(String currentFilePath);
     /*

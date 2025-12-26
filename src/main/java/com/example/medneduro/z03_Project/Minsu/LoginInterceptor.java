@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.io.PrintWriter;
+
 // 클래스를 스프링 컨테이너에 Bean 개개체로 등록..
 // 나중에 설정 클래스 InterceptorConfig에서 @Autowired로 가져오기 위해서
 @Component
@@ -35,6 +37,9 @@ public class LoginInterceptor implements HandlerInterceptor{
         String userType = (String) session.getAttribute("userType"); // 세션에 저장된 권한(doctor/general)
         String uri = request.getRequestURI(); // 사용자가 요청한 주소 (예: /maindoctorpage)
         // [주의] URL과 URI는 다름!!
+        // 디버깅용 로그(콘솔창 확인용 - 작동 여부 포함_
+        System.out.println(">>> 인터셉터 감지: "+ uri + " (사용자 유형: "+ userType +") ");
+
         /*
         request.getSession()
         - 출처: request 객체 내부에서 꺼내옴
@@ -61,31 +66,40 @@ public class LoginInterceptor implements HandlerInterceptor{
             - 기능: 사용자의 브라우저에게 이 주소로 다시 강제로 이동해! 라고 명령을 내립니다.
                     여기서는 로그인 페이지로 강제 이동시킴
             */
+            System.out.println(">>> 비로그인 접근 차단! 로그인 페이지로 이동합니다.");
             response.sendRedirect(request.getContextPath()+"/loginpage");
             // 검문 통과 실패 및 컨트롤러 실행이 즉시 중단
             return false;
         }
+        // 권한 체크 로직
+        // contains 대신 명확하게 직관적으로 하기 위해 소문자로 변환 후 체크!
+        String lowerUri = uri.toLowerCase();
+        String msg = null;
 
-        if(uri.contains("doctor") && !"doctor".equals(userType)){
-            // 자바스크립트로 경고창을 띄우고 이전 페이지로 돌려보내기
-            response.setContentType("text/html;charset=utf-8");
-            java.io.PrintWriter out = response.getWriter();
-            out.println("<script>");
-            out.println("alert('의사 전용 메뉴입니다. 접근 권한이 없습니다.');");
-            out.println("history.back();"); // 이전 페이지(일반 페이지)로 이동
-            out.println("</script>");
-            out.flush();
-            return false;
+        if(lowerUri.contains("doctor") && !"doctor".equals(userType)){
+            msg = "의사 전용 메뉴입니다. 접근 권한이 없습니다.";
         }
-        if(uri.contains("general") && !"general".equals(userType)){
-            // 자바스크립트로 경고창을 띄우고 이전 페이지로 돌려보내기
-            response.setContentType("text/html;charset=utf-8");
-            java.io.PrintWriter out = response.getWriter();
+        if(lowerUri.contains("general") && !"general".equals(userType)){
+            msg = "일반 회원 전용 메뉴입니다. 접근 권한이 없습니다.";
+        }
+        if(msg != null){
+            System.out.println(">>> 권한 없음 차단 : "+ msg); // 로그 확인용
+
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+
+            // 완벽한 HTML 구조로 출력해야 브라우저가 100% 인식 가능함.
+            out.println("<!DOCTYPE html>");
+            out.println("<html><body>");
             out.println("<script>");
-            out.println("alert('일반 회원 전용 메뉴입니다. 접근 권한이 없습니다.');");
-            out.println("history.back();"); // 이전 페이지(일반 페이지)로 이동
+            out.println("alert('" + msg + "');");
+            out.println("history.back();"); // 이전 페이지로 빽!
             out.println("</script>");
+            out.println("</body></html>");
+
             out.flush();
+            out.close(); // 펜 뚜껑 닫기 (중요)
+
             return false;
         }
 

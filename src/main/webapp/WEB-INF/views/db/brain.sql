@@ -59,6 +59,7 @@ CREATE TABLE INTEGRATED_ACCOUNT (
                                     JOIN_DATE       DATE           DEFAULT SYSDATE,
                                     CONSTRAINT UK_ACCOUNT_LOGIN_ID UNIQUE (LOGIN_ID)
 );
+SELECT * FROM INTEGRATED_ACCOUNT;
 
 -- [4] 자식 테이블: MEDICAL_STAFF (의료진)
 CREATE TABLE MEDICAL_STAFF (
@@ -419,5 +420,8 @@ FROM MEDICAL_MRI_FOLDER m
 -- WHERE a.LOGIN_ID = '1'
 ORDER BY m.UPLOAD_DT DESC;
 */
+
+SELECT * fROM GENERAL;
+SELECT * fROM Integrated_Account;
 
 commit;

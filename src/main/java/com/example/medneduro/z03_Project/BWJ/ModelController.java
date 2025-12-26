@@ -363,11 +363,32 @@ public class ModelController {
      */
     List<Map<String, String>> historyList = serviceLogin.getHistoryList(filePath);
 
+    // REST API (Ajax 통신)
     return Map.of(
             "ok", true,
             "fileId",fileId,
             "originalName",originalName,
             "historyList",historyList
             );
+    /*
+        출력 형식
+        {
+          "ok": true,
+          "fileId": 105,
+          "originalName": "kim_brain_mri.jpg",
+          "historyList": [
+        {
+          "fileName": "/upload/2024/old_mri_01.jpg",
+          "patientName": "홍길동",
+          "uploadDt": "2023-12-01 14:00"
+        },
+        {
+          "fileName": "/upload/2024/old_mri_02.jpg",
+          "patientName": "홍길동",
+          "uploadDt": "2024-05-10 09:30"
+        }
+        ]
+}
+    */
     }
 }

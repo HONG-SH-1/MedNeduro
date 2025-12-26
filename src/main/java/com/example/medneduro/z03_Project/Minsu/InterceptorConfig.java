@@ -26,7 +26,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
         // 여기서 registry(등록부)에 등록한 검문소 이름을 올리는 것! (페이지)
         registry.addInterceptor(loginInterceptor)
                 // 검사할 주소들(이 주소들은 로그인이 없으면 못들어감)
-                .addPathPatterns("/maingeneralpage", "/maindoctorpage","/view/**")
+                .addPathPatterns("/**")
 
                 // 제외할 주소들(로그인 안 해도 보여야할 페이지들)
                 // 이 제외를 하지 않으면 해당 페이지로 갔을 때, 또 등록되지 않았다고 처리가 되어 무한 반복이 됨..
@@ -42,8 +42,20 @@ public class InterceptorConfig implements WebMvcConfigurer {
                         인터셉터는 메인 페이지로 돌려보낸다..
                         */
                         "/checkId",
-                        // 현재 static파일을 포함한 하위 모든 폴더 및 파일(css나 js 구문)도 예외해야 됨..
-                        "/static/**"
+                        "/api/logout",
+
+                        "/viewer/css/**",
+                        "/viewer/js/**",
+                        "/viewer/img/**",
+                        "/api/health",
+
+                        // [중요] 정적 리소스 경로를 명확하게 지정해야 CSS/JS가 깨지지 않습니다.
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/com/**",          // 부트스트랩 등이 들어있는 폴더
+                        "/favicon.ico",     // 웹사이트 아이콘
+                        "/error"            // 스프링 기본 에러 페이지
                 );
 
     }

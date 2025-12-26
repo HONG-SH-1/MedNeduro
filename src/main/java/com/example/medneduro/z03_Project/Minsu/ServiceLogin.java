@@ -151,6 +151,7 @@ public class ServiceLogin {
     public List<Map<String, String>> getHistoryList(String filePath) {
         // DAO에 있는 메서드를 호출해서 결과를 리턴합니다.
         return dao.getPatientMriHistory(filePath);
+        // DTO가 아닌 Map을 사용한 이유로는 "빠르게 데이터를 조회해서 화면에 뿌려주겠다"라는 실전형 전략
     }
 
 }

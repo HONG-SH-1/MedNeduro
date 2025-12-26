@@ -2,6 +2,7 @@ package com.example.medneduro.z03_Project.Minsu;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -119,8 +120,13 @@ public class ControllerLogin {
 
         // 1. 서비스 호출
         String result = service.registerProc(register);
+    /*
+    기존 if문 여러번을 사용하면 DB에 조회, 저장하는 2번의 통신을 하지만
+    tyy-catch를 사용하면 일단 DB 저장 후 오류가 나면 그 때 처리하는 방법!!
 
-        // 2. 결과에 따른 메시지 및 이동 처리
+    */
+    try{ // try 시도 중 에러가 나면 catch 블록으로 점프
+        // 2. 결과에 따른 메시지 처리 (DB 에러 없이 로직상 리턴된 경우)
         if(result.equals("SUCCESS")) {
             d.addFlashAttribute("msg", "회원가입이 완료되었습니다! 로그인 해주세요.");
             return "redirect:/loginpage"; // 성공 시 로그인 페이지로
@@ -139,6 +145,17 @@ public class ControllerLogin {
         else {
             d.addFlashAttribute("msg", "회원가입 중 알 수 없는 오류가 발생했습니다.");
         }
+        // DataIntegrityViolationException = 무결성 제약 조건 위반 에러
+    } catch(DataIntegrityViolationException e) {
+        // 여기서 DB 무결성 에러(주민번호/전화번호 중복 등)를 낚아채기!
+        System.out.println("DB 중복 에러 발생: "+ e.getMessage()); // 로그용
+        d.addFlashAttribute("msg","이미 가입된 회원 정보(주민번호 등)입니다.");
+        // redircer하면 Model에 담은 데이터는 날아가지만, addFlashAttribute는 단 한 번 다음페이지 까지 살아서 메시지르 전달해줌
+    } catch (Exception e){
+        // 그 외 예상치 못한 모든 에러 처리
+        e.printStackTrace();
+        d.addFlashAttribute("msg","시스템 에러가 발생했습니다. 관리자에게 문의하세요.");
+    }
         // 실패 시 공통적으로 가입 페이지로 리다이렉트
         return "redirect:/registerPage";
     }
