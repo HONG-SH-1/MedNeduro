@@ -1032,8 +1032,13 @@ function updateHistoryList(historyList, currentFileName) {
     const $container = $("#historyList"); // HTML에서 만든 그 공간
     // 1. DOM 요소 선택 : 리스트를 집어넣을 HTML 컨테이너 (div)를 가져옴
 
+    const $nameSpan = $("#targetPatientName");
+
+
     $container.empty(); // 기존 내용(안내문구 등) 지우기
     // 2. 초기화 : 기존에 표시되어 있던 리스트나 안내 문구를 싹 지웁니다.
+
+    $nameSpan.text("");
 
     // 기록이 없을 때
     // 3. 예외 처리 : 만약 리스트가 없거나 비어있다면? (무결성 검사)
@@ -1042,10 +1047,17 @@ function updateHistoryList(historyList, currentFileName) {
         $container.html('<div style="font-size:0.8rem; color:#888; text-align:center; margin-top:20px;">기록 없음</div>');
         return;
     }
+    const firstItem = historyList[0];
+    // [★추가] SQL에서 새로 가져온 환자 이름과 성별 꺼내기
+    // 값이 없을 수도 있으니(null) 'Unknown' 같은 기본값 처리
+    const pNameHeader = firstItem.patientName || firstItem.PATIENTNAME || "이름미상";
+    const pGenderHeader = firstItem.gender || firstItem.GENDER || "";
+
+    $nameSpan.text(` - ${pNameHeader} (${pGenderHeader})`);
 
     // 리스트 하나씩 HTML 만들기
     // 4. 리스트 순회 : 받아온 목록(Array)을 하나씩 돌면서 HTML을 만듭니다.
-    historyList.forEach(item => {
+    historyList.forEach((item, index) => {
         /*
             화살표 함수
             기존 => historyList.forEach(function(item) {})
@@ -1060,10 +1072,18 @@ function updateHistoryList(historyList, currentFileName) {
         // item.fileName이 있으면 쓰고, 없으면 item.FILENAME을 쓴다
         const name = item.fileName || item.FILENAME || item.IMAGE_FOLDER_PATH;
         const date = item.uploadDt || item.UPLOADDT || item.UPLOAD_DT;
-        // [★추가] SQL에서 새로 가져온 환자 이름과 성별 꺼내기
-        // 값이 없을 수도 있으니(null) 'Unknown' 같은 기본값 처리
-        const pName = item.patientName || item.PATIENTNAME || "이름미상";
-        const gender = item.gender || item.GENDER || "";
+
+        // 확장자 추출 (.nii 또는 .nii.gz)
+        const lowerName = name.toLowerCase();
+        const ext = lowerName.endsWith(".nii.gz") ? ".nii.gz" : ".nii";
+
+        // 번호 매기기 (리스트가 최신순이므로 역순으로 계산)
+        // 예: 총 3개일 때 -> 0번 인덱스(최신) = 3번, 1번 인덱스 = 2번...
+        const seqNum = historyList.length - index;
+        const seqStr = String(seqNum).padStart(3, "0"); // 1 -> "001"
+
+        // 최종 표시 이름: "홍길동_003.nii.gz"
+        const displayName = `${pNameHeader}_${seqStr}${ext}`;
 
         // 조건부 스타일링 - 현재 보고 있는 파일인지 확인
         // 만약 리스트의 파일명(name)이 현재 파일명(currentFileName)과 같다면?
@@ -1076,7 +1096,11 @@ function updateHistoryList(historyList, currentFileName) {
         // onclick 이벤트 : 클릭 시 다시 loadServerFile을 호출하여 해당 파일로 화면 전환 (재귀적 구조)
         const html = `
             <div class="mini-hist-item" onclick="loadServerFile('${name}')" style="cursor:pointer; padding:6px 0; border-bottom:1px solid #333;">
-                <div style="font-size:0.85rem; ${activeStyle}">${name}</div>
+                
+                <div style="font-size:0.85rem; ${activeStyle}" title="${name}">
+                    ${displayName}
+                </div>
+                
                 <div style="font-size:0.75rem; color:#666;">${date}</div>
             </div>
         `;

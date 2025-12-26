@@ -323,14 +323,9 @@ public class ModelController {
      */
     String originalName = source.getFileName().toString(); // 여긴 왜 .replace를 사용하지 않는가..? 실제 이름이라서?
     String ext = originalName.toLowerCase().endsWith(".nii.gz") ? ".nii.gz" : ".nii";
+    String targetFileName = source.getFileName().toString();
 
-    String displayName = originalName;
 
-    if (originalName.length() > 33 && originalName.contains("_")){
-        // "UUID_진짜이름" 형태라고 가정하고 뒷부분만 남김
-        // 예: "6eaede3dcc92425989a236a9db7e9b9f_Brain.nii" -> "Brain.nii"
-        displayName = originalName.substring(33);
-    }
 
     /*
         파일이 .nii 인지 .nii.gz (압축파일)인지 확인해서, 복사본에도 똑같은 꼬리표를 붙여줘야 합니다.
@@ -373,11 +368,68 @@ public class ModelController {
      */
     List<Map<String, String>> historyList = serviceLogin.getHistoryList(filePath);
 
+    // 기본값 설정 DB에 환자 정보가 없을 때에 설정...
+    String cleanName = "Unknow" + ext;
+
+    // DB에 정보가 있다면? => 환자 이름을 꺼내서 파일명으로 쓰기!
+        if (historyList != null && !historyList.isEmpty()) {
+
+            // (1) 환자 이름 가져오기 (첫 번째 데이터 기준)
+            Map<String, String> firstItem = historyList.get(0);
+            String pName = firstItem.get("patientName");
+            if (pName == null) pName = firstItem.get("PATIENTNAME"); // 대소문자 방어
+            if (pName == null) pName = "Patient";
+
+            // (2) 순서 찾기 로직
+            int seqNum = 1;
+            int totalCount = historyList.size();
+            boolean found = false;
+
+            System.out.println("=== 파일 찾기 디버깅 시작 ===");
+            System.out.println("찾는 파일명: " + targetFileName);
+
+            for (int i = 0; i < totalCount; i++) {
+                Map<String, String> item = historyList.get(i);
+
+                // DB에서 경로 꺼내기
+                String dbFullPath = item.get("fileName");
+                if (dbFullPath == null) dbFullPath = item.get("FILENAME");
+                if (dbFullPath == null) dbFullPath = item.get("IMAGE_FOLDER_PATH"); // 혹시 몰라 추가
+
+                if (dbFullPath != null) {
+                    // [★핵심] DB 경로에서도 "파일명만" 추출해서 비교합니다.
+                    // 윈도우(\), 리눅스(/) 경로 구분자 모두 처리
+                    String dbFileName = Paths.get(dbFullPath).getFileName().toString();
+
+                    // 디버깅 로그 (콘솔에서 확인 가능)
+                    System.out.println("비교 중... DB파일: " + dbFileName + " vs 타겟: " + targetFileName);
+
+                    if (dbFileName.equals(targetFileName)) {
+                        // 찾았다!
+                        seqNum = totalCount - i; // 최신순 정렬이므로 역순 계산
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            System.out.println("=== 디버깅 종료 (찾았나? " + found + ") ===");
+
+            // (3) 못 찾았으면, 그냥 1번을 부여하거나 "Unknown" 대신 환자 이름이라도 넣기
+            if (!found) {
+                // 리스트에는 있는데 매칭이 안 된 경우 -> 그냥 최신 파일(마지막 번호)로 간주하거나
+                // 최소한 "홍길동_Unknown.nii" 처럼 이름은 살려줍니다.
+                cleanName = pName + "_Unknown" + ext;
+            } else {
+                // 정상적으로 찾은 경우 -> "홍길동_001.nii"
+                cleanName = String.format("%s_%03d%s", pName, seqNum, ext);
+            }
+        }
+
     // REST API (Ajax 통신)
     return Map.of(
             "ok", true,
             "fileId",fileId,
-            "originalName",originalName,
+            "originalName",cleanName,
             "historyList",historyList
             );
     /*
