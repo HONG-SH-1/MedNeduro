@@ -128,6 +128,7 @@
             <div class="info-card" style="display:flex; flex-direction:column;">
                 <div style="font-weight:bold; border-bottom:1px solid #444; padding-bottom:8px; margin-bottom:8px;">
                 환자 MRI 기록
+                    <span id="targetPatientName" style="color:#4D79FF; margin-left:8px; font-size:0.9em;"></span>
             </div>
 
             <div id="historyList" style="flex:1; overflow-y:auto;">
@@ -140,11 +141,7 @@
             <div class="info-card" style="display:flex; flex-direction:column;">
                 <div style="font-weight:bold; border-bottom:1px solid #444; padding-bottom:8px; margin-bottom:8px;">
                     진단 코멘트
-
                 </div>
-                <textarea id="diagnosisInput"
-                          style="flex:1; background:transparent; border:none; color:#eee; resize:none;"
-                          placeholder="진단 내용을 입력하세요"></textarea>
             </div>
 
 
