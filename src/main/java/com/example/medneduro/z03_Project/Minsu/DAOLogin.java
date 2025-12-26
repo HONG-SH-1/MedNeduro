@@ -201,6 +201,7 @@ List<MriListM> getMriList(String loginId);
         SELECT sub.PATIENT_ID  -- 환자의 아이디
         FROM MEDICAL_MRI_FOLDER sub 
         WHERE sub.IMAGE_FOLDER_PATH = #{currentFilePath} -- 이미지 폴더의 내가 선택한 폴더
+        AND ROWNUM =1 
     )
     ORDER BY m.UPLOAD_DT DESC -- 최근 검사 기록
 """)
