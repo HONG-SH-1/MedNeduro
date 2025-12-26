@@ -885,7 +885,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(err => {
                 console.error("로딩 실패:", err);
                 alert("파일 로딩 실패: " + err.message);
-            });
+            }); /*아녕하세요~*/
     }
 
 
