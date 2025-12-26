@@ -129,6 +129,8 @@
                 <div style="font-weight:bold; border-bottom:1px solid #444; padding-bottom:8px; margin-bottom:8px;">
                 환자 MRI 기록
                     <span id="targetPatientName" style="color:#4D79FF; margin-left:8px; font-size:0.9em;"></span>
+                <ul id="historyList" style="flex:1; overflow-y:auto;">
+                </ul>
             </div>
 
             <div id="historyList" style="flex:1; overflow-y:auto;">

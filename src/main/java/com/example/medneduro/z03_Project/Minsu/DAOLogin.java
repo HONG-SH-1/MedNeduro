@@ -184,13 +184,13 @@ List<MriListM> getMriList(String loginId);
     @Select("""
     SELECT 
         -- 1. MRI 파일 정보
-        m.IMAGE_FOLDER_PATH                        AS fileName, -- 파일 경로
-        TO_CHAR(m.UPLOAD_DT, 'YYYY-MM-DD HH24:MI') AS uploadDt, -- 업로드 날짜
+        m.IMAGE_FOLDER_PATH                        AS "fileName", -- 파일 경로
+        TO_CHAR(m.UPLOAD_DT, 'YYYY-MM-DD HH24:MI') AS "uploadDt", -- 업로드 날짜
         
         -- 2. [추가된 부분] 환자 상세 정보
-        p.PATIENT_NAME                             AS patientName, -- 환자 이름
-        p.GENDER                                   AS gender, -- 성별
-        p.BIRTH_DATE                               AS birthDate -- 생년월일
+        p.PATIENT_NAME                             AS "patientName", -- 환자 이름
+        p.GENDER                                   AS "gender", -- 성별
+        p.BIRTH_DATE                               AS "birthDate" -- 생년월일
 
     FROM MEDICAL_MRI_FOLDER m -- MRI 폴더를 기준으로
     -- [핵심] 환자 정보를 가져오기 위해 테이블 연결 (JOIN)
