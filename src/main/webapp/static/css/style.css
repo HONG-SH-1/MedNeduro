@@ -766,7 +766,7 @@ body{
 /* [5] 왼쪽 패널: 환자 검색 및 목록 */
 /* ========================================= */
 .left-panel {
-    width: 250px;               /* 고정 너비 혹은 35% */
+    width: 250px;               /* 고정 너비 혹은 % */
     background-color: #252528;  /* 오른쪽보다 살짝 밝게 구분 */
     border-right: 1px solid #3A3A3C;
     display: flex;
@@ -778,6 +778,15 @@ body{
     padding: 15px;
     border-bottom: 1px solid #3A3A3C;
 }
+
+/*
+height: 70px;  높이 고정 (우측과 맞추기 위함)
+display: flex;
+align-items: center; 세로 중앙 정렬
+padding: 0 15px;     위아래 패딩은 빼고 좌우만 줌
+border-bottom: 1px solid #3A3A3C;
+background-color: #262629
+*/
 
 #searchInput {
     width: 100%;
@@ -877,11 +886,17 @@ body{
 }
 
 .right-header {
-    padding: 20px;
+    height: 70px; /* 왼쪽과 똑같은 높이로 설정 */
+    display: flex;
+    align-items: center; /* 세로 중앙 정렬 */
+    padding: 0 20px;     /* 위아래 패딩 빼고 좌우만 */
     border-bottom: 1px solid #3A3A3C;
-    font-size: 1rem;
-    color: #E5E5E7;
     background-color: #232325;
+
+    /* 텍스트 스타일 유지 */
+    font-size: 1rem;
+    font-weight: 500;
+    color: #E5E5E7;
 }
 
 /* 파일 리스트 (스크롤) */
