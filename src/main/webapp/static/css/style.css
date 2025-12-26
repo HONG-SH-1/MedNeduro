@@ -641,67 +641,6 @@ body{
   /* 최소 변경 */
 }
 
-
-
-.modal-overlay{
-    position: fixed; /* 화면 고정 */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 2000;
-    display: flex;
-    justify-content: center;  /* 가로(좌우) 가운데 정렬 */
-    align-items: center;      /* 세로(상하) 가운데 정렬 */
-}
-.modal-window{
-    background-color: #1C1C1E; /* 전체 배경을 어둡게 */
-    width: 800px;
-    height: 600px;
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8); /* 그림자도 더 깊게 */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    color: #E5E5E7; /* 기본 텍스트를 밝은 회색으로 */
-    border: 1px solid #3A3A3C; /* 모달 경계선 추가 */
-}
-.modal-header{
-    background-color: #2C2C2E; /* 헤더는 본문보다 약간 밝게 */
-    padding: 14px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #3A3A3C; /* 경계선 색상 조절 */
-    font-weight: 600;
-    color: #FFFFFF; /* 헤더 제목은 완전 화이트 */
-}
-.modal-body {
-    padding: 20px;
-    overflow-y: auto;
-    flex: 1;
-    border: 1.5px solid #1C1C1E; /* 트랙 배경색과 같은 보더를 주면 막대가 얇아 보이고 여백이 생김 */
-}
-
-/* 5. 닫기 버튼 스타일 */
-.close-btn {
-    border: none;
-    background: transparent;
-    font-size: 20px;
-    cursor: pointer;
-    color: #8E8E93; /* 기본 상태는 차분하게 */
-    line-height: 1;
-}
-
-.close-btn:hover {
-    color: #FF453A; /* 호버 시에만 강조(시스템 레드) */
-}
-
-/* 6. 숨김 처리용 (JS로 제어할 예정) */
-.hidden {
-    display: none !important;
-}
 /* --- 파일 리스트 스타일 --- */
 .file-list-group {
     list-style: none;
@@ -739,44 +678,50 @@ body{
 }
 
 
-/* [1] 모달 오버레이  */
+/* ========================================= */
+/* [1] 모달 오버레이 (배경) */
+/* ========================================= */
 .modal-overlay {
-    /* ★ 핵심: 평소에는 숨겨둠 (JS가 .show를 붙이기 전까지) */
-    display: none;
-
-    /* 위치 및 배경 설정 (기존 디자인 유지) */
+    display: none; /* 평소에는 숨김 */
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검은 배경 */
-    z-index: 2000; /* 제일 위에 뜨도록 */
-
-    /* 내용물 중앙 정렬 */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
     justify-content: center;
     align-items: center;
 }
 
-/* ★ 핵심: JS에서 modal.classList.add('show')를 하면 이 클래스가 붙어서 보임 */
+/* JS에서 .show 클래스를 붙이면 보임 */
 .modal-overlay.show {
     display: flex !important;
 }
 
 /* ========================================= */
-/* [2] 모달 윈도우 (디자인 유지) */
+/* [2] 모달 윈도우 (메인 컨테이너) */
 /* ========================================= */
 .modal-window {
-    background-color: #1C1C1E; /* 어두운 배경 */
-    width: 800px;
+    background-color: #1C1C1E;
+    width: 800px; /* 기본 너비 */
     height: 600px;
-    border-radius: 12px;       /* 둥근 모서리 */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8); /* 깊은 그림자 */
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    color: #E5E5E7;            /* 텍스트 색상 */
-    border: 1px solid #3A3A3C; /* 테두리 */
+    overflow: hidden; /* 둥근 모서리 밖으로 내용 튀어나감 방지 */
+    color: #E5E5E7;
+    border: 1px solid #3A3A3C;
 }
 
+/* 좌우 분할용 넓은 모달 (클래스 추가 시 적용) */
+.modal-window.wide-modal {
+    width: 950px;       /* 좌우 분할이라 조금 더 넓게 */
+    max-width: 95vw;    /* 화면보다 커지지 않게 */
+}
+
+/* ========================================= */
+/* [3] 모달 헤더 */
+/* ========================================= */
 .modal-header {
     background-color: #2C2C2E;
     padding: 14px 20px;
@@ -784,28 +729,15 @@ body{
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #3A3A3C;
+    flex-shrink: 0; /* 헤더 높이 고정 */
+}
+
+.modal-title {
     font-weight: 600;
     color: #FFFFFF;
+    font-size: 1.1rem;
 }
 
-.modal-body {
-    padding: 20px;
-    overflow-y: auto;
-    flex: 1;
-    display: flex;
-    flex-direction: column; /* 내부 요소 세로 정렬 */
-}
-
-/* 모달 설명 텍스트 */
-.modal-desc {
-    margin: 0 0 15px 0;
-    color: #8E8E93;
-    font-size: 0.95rem;
-}
-
-/* ========================================= */
-/* [3] 닫기 버튼 (X) 스타일 */
-/* ========================================= */
 .close-btn {
     border: none;
     background: transparent;
@@ -817,73 +749,149 @@ body{
 }
 
 .close-btn:hover {
-    color: #FF453A; /* 마우스 올리면 빨간색 */
+    color: #FF453A;
 }
+
+/* ========================================= */
+/* [4] 모달 바디 (좌우 패널 컨테이너) */
+/* ========================================= */
+.modal-body.split-view {
+    display: flex;       /* 좌우 정렬 */
+    flex: 1;             /* 남은 높이 모두 차지 */
+    padding: 0;          /* 내부 패딩 제거 (패널 안에서 처리) */
+    overflow: hidden;    /* 전체 스크롤 없애고 패널별 스크롤 적용 */
+}
+
+/* ========================================= */
+/* [5] 왼쪽 패널: 환자 검색 및 목록 */
+/* ========================================= */
+.left-panel {
+    width: 320px;               /* 고정 너비 혹은 35% */
+    background-color: #252528;  /* 오른쪽보다 살짝 밝게 구분 */
+    border-right: 1px solid #3A3A3C;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 검색창 영역 */
 .search-container {
-    width: 100%;            /* 컨테이너 너비 100% */
-    margin-bottom: 20px;    /* 리스트와의 간격 넓힘 */
-    box-sizing: border-box; /* 패딩 포함 너비 계산 */
+    padding: 15px;
+    border-bottom: 1px solid #3A3A3C;
 }
 
 #searchInput {
-    width: 100%;            /* 부모(.search-container) 너비에 맞춤 */
-    padding: 12px 15px;     /* 내부 여백을 넉넉하게 (높이 확보) */
-
-    background-color: #2C2C2E; /* 배경색: 모달 본문보다 약간 밝은 다크그레이 */
-    border: 1px solid #3A3A3C; /* 테두리: 은은한 회색 */
-    border-radius: 8px;        /* 모서리 둥글게 */
-
-    color: #FFFFFF;            /* 입력 글자색: 흰색 */
-    font-size: 1rem;           /* 글자 크기 적당히 키움 */
-
-    outline: none;             /* 클릭 시 기본 파란 테두리 제거 */
-    transition: border-color 0.2s, background-color 0.2s;
+    width: 100%;
+    padding: 10px 14px;
+    background-color: #1C1C1E;
+    border: 1px solid #3A3A3C;
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
 }
 
-/* 입력창 클릭(포커스)했을 때 효과 */
 #searchInput:focus {
-    border-color: #4CAF50;     /* 메인 테마 색상(초록)으로 강조 */
-    background-color: #3A3A3C; /* 배경을 살짝 더 밝게 */
+    border-color: #4CAF50;
 }
 
-/* 플레이스홀더(안내 문구) 색상 */
-#searchInput::placeholder {
-    color: #8E8E93; /* 너무 튀지 않는 회색 */
+/* 환자 리스트 (스크롤) */
+.patient-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;            /* 남은 높이 채우기 */
+    overflow-y: auto;   /* 내용 많으면 스크롤 */
 }
-.modal-file-list {
-    list-style: none;      /* ★ 핵심: 리스트 앞의 점(•) 제거 */
-    padding-left: 0;       /* ★ 핵심: ul 태그의 기본 왼쪽 들여쓰기 제거 */
-    margin: 0;             /* 기본 여백 제거 */
 
-    overflow-y: auto;      /* 스크롤 가능하게 */
-    max-height: 350px;     /* 리스트 영역 높이 제한 (스크롤 생김) */
-
-    /* 스크롤바 디자인과 겹치지 않게 오른쪽 패딩 살짝 */
-    padding-right: 5px;
+.patient-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #323235;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: #8E8E93;
 }
+
+.patient-item:hover {
+    background-color: #2F2F32;
+    color: #E5E5E7;
+}
+
+/* 환자 선택됨 (Active) */
+.patient-item.active {
+    background-color: #3A3F4A; /* 또는 #4CAF50 (취향껏 선택) */
+    border-left: 4px solid #4CAF50; /* 왼쪽 강조선 */
+    color: #FFFFFF;
+}
+.patient-item.active span {
+    color: #FFFFFF !important;
+}
+
+/* ========================================= */
+/* [6] 오른쪽 패널: MRI 파일 목록 */
+/* ========================================= */
+.right-panel {
+    flex: 1;                    /* 나머지 너비 모두 차지 */
+    background-color: #1C1C1E;  /* 어두운 배경 */
+    display: flex;
+    flex-direction: column;
+}
+
+.right-header {
+    padding: 20px;
+    border-bottom: 1px solid #3A3A3C;
+    font-size: 1rem;
+    color: #E5E5E7;
+    background-color: #232325;
+}
+
+/* 파일 리스트 (스크롤) */
+.file-list {
+    list-style: none;
+    margin: 0;
+    padding: 10px;      /* 파일 목록은 약간 여백 줌 */
+    flex: 1;            /* 남은 높이 채우기 */
+    overflow-y: auto;   /* 스크롤 */
+}
+
 .file-item {
-    background-color: #2C2C2E; /* 아이템 배경색 (입력창과 통일감) */
-    padding: 15px;             /* 내부 여백 넉넉히 */
-    margin-bottom: 8px;        /* 아이템 사이 간격 */
-    border-radius: 8px;        /* 둥근 모서리 */
-    border: 1px solid transparent; /* 테두리 공간 확보 */
-
-    cursor: pointer;           /* 마우스 올리면 손가락 모양 */
-    color: #E5E5EA;            /* 글자색 */
-
-    display: flex;             /* 내부 요소 배치 (좌우 정렬 등) */
+    background-color: #2C2C2E;
+    padding: 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: flex;
     justify-content: space-between;
     align-items: center;
-
-    transition: all 0.2s ease; /* 부드러운 애니메이션 */
+    color: #E5E5EA;
+    transition: all 0.2s ease;
 }
 
-/* 마우스 올렸을 때 효과 */
 .file-item:hover {
-    background-color: #3A3A3C; /* 배경 밝아짐 */
-    border-color: #636366;     /* 테두리 생김 */
-    transform: translateY(-1px); /* 살짝 떠오르는 효과 (선택사항) */
+    background-color: #3A3A3C;
+    border-color: #555;
+    transform: translateY(-2px);
 }
+
+/* ========================================= */
+/* [7] 스크롤바 커스텀 (크롬, 사파리 등) */
+/* ========================================= */
+.patient-list::-webkit-scrollbar,
+.file-list::-webkit-scrollbar {
+    width: 8px;
+}
+.patient-list::-webkit-scrollbar-thumb,
+.file-list::-webkit-scrollbar-thumb {
+    background-color: #3A3A3C;
+    border-radius: 4px;
+}
+.patient-list::-webkit-scrollbar-track,
+.file-list::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/*모달 종료*/
 
 /* [사이드바 서랍: 디스코드 배경색 적용] */
 .side-drawer {

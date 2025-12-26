@@ -162,25 +162,30 @@
 
 <!-- 이하 모달-->
 <div id="myModal" class="modal-overlay">
-    <div class="modal-window">
-        <div class="modal-header">
-            <span class="modal-title">환자 MRI 리스트 선택</span>
-            <button class="close-btn">&times;</button>
-        </div>
+    <div class="modal-window wide-modal"> <div class="modal-header">
+        <span class="modal-title">환자 및 MRI 선택</span>
+        <button class="close-btn">&times;</button>
+    </div>
 
-        <div class="modal-body">
-            <div class="modal-top-section">
-                <p class="modal-desc">분석할 파일을 선택해주세요.</p>
+        <div class="modal-body split-view">
 
+            <div class="left-panel">
                 <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="파일명 검색 (예: T1, Brain...)" autocomplete="off">
+                    <input type="text" id="searchInput" placeholder="환자명/생년월일 검색" autocomplete="off">
                 </div>
+                <ul id="patientList" class="patient-list">
+                </ul>
             </div>
 
-            <ul id="modalFileList" class="modal-file-list">
-            </ul>
-        </div>
+            <div class="right-panel">
+                <div class="right-header" id="rightHeader">
+                    <p>환자를 선택해주세요.</p>
+                </div>
+                <ul id="fileList" class="file-list">
+                </ul>
+            </div>
 
+        </div>
     </div>
 </div>
 
