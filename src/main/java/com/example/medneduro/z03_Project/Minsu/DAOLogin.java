@@ -196,7 +196,7 @@ List<MriListM> getMriList(String loginId);
     -- [핵심] 환자 정보를 가져오기 위해 테이블 연결 (JOIN)
     INNER JOIN PATIENT p ON m.PATIENT_ID = p.PATIENT_ID -- 환자의 아이디로 Join
 
-    WHERE m.PATIENT_ID = ( -- 선택한 환자의 아이디를 뽑아냄
+    WHERE m.PATIENT_ID IN ( -- 선택한 환자의 아이디를 뽑아냄
         -- 서브쿼리: 파일 경로로 환자 찾기 (기존 유지)
         SELECT sub.PATIENT_ID  -- 환자의 아이디
         FROM MEDICAL_MRI_FOLDER sub 
