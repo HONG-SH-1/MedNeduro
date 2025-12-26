@@ -10,6 +10,31 @@
 
 const API_BASE = `/api`;
 
+/**
+ * ✅ [공통 함수] 파일명 예쁘게 변환하기 (Master Key)
+ * * @param {string} rawName      - 원본 파일명 (UUID 포함)
+ * @param {string} patientName  - 환자 이름
+ * @param {number} index        - 현재 파일의 인덱스 (0부터 시작)
+ * @param {number} totalCount   - 전체 파일 개수
+ * @returns {string}            - 변환된 이름 (예: 홍길동_003.nii)
+ */
+function getPrettyName(name, patientName, index, totalCount) {
+    // 1. 안전장치 (이름이 없으면 Unknown)
+    const pName = patientName || "Unknown";
+
+    // 2. 확장자 찾기
+    const lower = name.toLowerCase();
+    const ext = lower.endsWith(".nii.gz") ? ".nii.gz" : ".nii";
+
+    // 3. 번호 매기기 (역순: 최신 파일이 높은 번호)
+    // 예: 총 3개일 때 -> 0번(최신) = 3, 1번 = 2, 2번 = 1
+    const seqNum = totalCount - index;
+    const seqStr = String(seqNum).padStart(3, "0"); // 1 -> "001"
+
+    // 4. 합치기
+    return `${pName}_${seqStr}${ext}`;
+}
+
 
 /**
  * ✅ 멀티탭(세션) 저장 구조
@@ -147,9 +172,11 @@ $(document).ready(function () {
             }
         })
     })
+
   // ✅ 초기 화면
   showUploadView();
 });
+
 
 /**
  * ✅ 썸네일 바 토글
@@ -1066,9 +1093,7 @@ function updateHistoryList(historyList, currentFileName) {
 
     const $container = $("#historyList"); // HTML에서 만든 그 공간
     // 1. DOM 요소 선택 : 리스트를 집어넣을 HTML 컨테이너 (div)를 가져옴
-
-    const $nameSpan = $("#targetPatientName");
-
+    const $nameSpan =$("#targetPatientName");
 
     $container.empty(); // 기존 내용(안내문구 등) 지우기
     // 2. 초기화 : 기존에 표시되어 있던 리스트나 안내 문구를 싹 지웁니다.
@@ -1085,10 +1110,9 @@ function updateHistoryList(historyList, currentFileName) {
     const firstItem = historyList[0];
     // [★추가] SQL에서 새로 가져온 환자 이름과 성별 꺼내기
     // 값이 없을 수도 있으니(null) 'Unknown' 같은 기본값 처리
-    const pNameHeader = firstItem.patientName || firstItem.PATIENTNAME || "이름미상";
-    const pGenderHeader = firstItem.gender || firstItem.GENDER || "";
-
-    $nameSpan.text(` - ${pNameHeader} (${pGenderHeader})`);
+    const pName = firstItem.patientName || firstItem.PATIENTNAME || "Unknown";
+    const pGender = firstItem.gender || firstItem.GENDER || "";
+    $("#targetPatientName").text(` - ${pName} (${pGender})`);
 
     // 리스트 하나씩 HTML 만들기
     // 4. 리스트 순회 : 받아온 목록(Array)을 하나씩 돌면서 HTML을 만듭니다.
@@ -1107,18 +1131,8 @@ function updateHistoryList(historyList, currentFileName) {
         // item.fileName이 있으면 쓰고, 없으면 item.FILENAME을 쓴다
         const name = item.fileName || item.FILENAME || item.IMAGE_FOLDER_PATH;
         const date = item.uploadDt || item.UPLOADDT || item.UPLOAD_DT;
+        const displayName = getPrettyName(name, pName, index, historyList.length);
 
-        // 확장자 추출 (.nii 또는 .nii.gz)
-        const lowerName = name.toLowerCase();
-        const ext = lowerName.endsWith(".nii.gz") ? ".nii.gz" : ".nii";
-
-        // 번호 매기기 (리스트가 최신순이므로 역순으로 계산)
-        // 예: 총 3개일 때 -> 0번 인덱스(최신) = 3번, 1번 인덱스 = 2번...
-        const seqNum = historyList.length - index;
-        const seqStr = String(seqNum).padStart(3, "0"); // 1 -> "001"
-
-        // 최종 표시 이름: "홍길동_003.nii.gz"
-        const displayName = `${pNameHeader}_${seqStr}${ext}`;
 
         // 조건부 스타일링 - 현재 보고 있는 파일인지 확인
         // 만약 리스트의 파일명(name)이 현재 파일명(currentFileName)과 같다면?
