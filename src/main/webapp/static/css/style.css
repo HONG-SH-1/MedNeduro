@@ -766,7 +766,7 @@ body{
 /* [5] 왼쪽 패널: 환자 검색 및 목록 */
 /* ========================================= */
 .left-panel {
-    width: 320px;               /* 고정 너비 혹은 35% */
+    width: 250px;               /* 고정 너비 혹은 % */
     background-color: #252528;  /* 오른쪽보다 살짝 밝게 구분 */
     border-right: 1px solid #3A3A3C;
     display: flex;
@@ -778,6 +778,15 @@ body{
     padding: 15px;
     border-bottom: 1px solid #3A3A3C;
 }
+
+/*
+height: 70px;  높이 고정 (우측과 맞추기 위함)
+display: flex;
+align-items: center; 세로 중앙 정렬
+padding: 0 15px;     위아래 패딩은 빼고 좌우만 줌
+border-bottom: 1px solid #3A3A3C;
+background-color: #262629
+*/
 
 #searchInput {
     width: 100%;
@@ -805,26 +814,65 @@ body{
 }
 
 .patient-item {
-    padding: 15px 20px;
+    /* [핵심] 가로 배치 설정 */
+    display: flex;
+    justify-content: space-between; /* 양 끝으로 벌리기 */
+    align-items: center;            /* 세로 중앙 정렬 */
+
+    padding: 12px 16px;             /* 여백을 살짝 줄여서 컴팩트하게 */
     border-bottom: 1px solid #323235;
     cursor: pointer;
     transition: background-color 0.2s;
-    color: #8E8E93;
+    background-color: transparent;  /* 기본 투명 */
 }
 
 .patient-item:hover {
     background-color: #2F2F32;
-    color: #E5E5E7;
+    /*color: #E5E5E7;*/
 }
 
 /* 환자 선택됨 (Active) */
 .patient-item.active {
-    background-color: #3A3F4A; /* 또는 #4CAF50 (취향껏 선택) */
-    border-left: 4px solid #4CAF50; /* 왼쪽 강조선 */
-    color: #FFFFFF;
+    background-color: #3A3F4A;
+    border-left: 4px solid #4CAF50;
+    padding-left: 12px; /* 보더 두께만큼 보정 */
 }
 .patient-item.active span {
     color: #FFFFFF !important;
+}
+/* [1] 왼쪽: 환자 이름 영역 */
+.p-name-area {
+    font-weight: 700;
+    font-size: 1.05rem; /* 이름은 크고 잘 보이게 */
+    color: #E5E5E7;
+}
+/* Active 상태일 때 이름 색상 */
+.patient-item.active .p-name-area {
+    color: #FFFFFF;
+}
+/* [2] 오른쪽: 정보 영역 (생년월일, 파일수) */
+.p-info-area {
+    display: flex;
+    flex-direction: column; /* 내부에서는 위아래로 쌓임 */
+    align-items: flex-end;  /* 우측 정렬 */
+    gap: 3px;               /* 줄 간격 좁게 */
+}
+
+.p-meta {
+    font-size: 0.8rem;
+    color: #8E8E93; /* 약간 어둡게 */
+}
+
+.p-count {
+    font-size: 0.75rem;
+    color: #636366; /* 더 어둡게 */
+    background-color: #1C1C1E; /* 살짝 박스 느낌 */
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+.patient-item.active .p-meta,
+.patient-item.active .p-count {
+    color: #D1D1D6;
 }
 
 /* ========================================= */
@@ -838,11 +886,17 @@ body{
 }
 
 .right-header {
-    padding: 20px;
+    height: 70px; /* 왼쪽과 똑같은 높이로 설정 */
+    display: flex;
+    align-items: center; /* 세로 중앙 정렬 */
+    padding: 0 20px;     /* 위아래 패딩 빼고 좌우만 */
     border-bottom: 1px solid #3A3A3C;
-    font-size: 1rem;
-    color: #E5E5E7;
     background-color: #232325;
+
+    /* 텍스트 스타일 유지 */
+    font-size: 1rem;
+    font-weight: 500;
+    color: #E5E5E7;
 }
 
 /* 파일 리스트 (스크롤) */

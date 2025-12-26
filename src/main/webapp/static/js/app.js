@@ -680,7 +680,8 @@ function animateThree() {
 // 버튼을 찾아줘!라고 명령해버리면 오류가 남.. 따라서 화면 그리기 끝나고 나서 DOMContentLoaded 안의 코드를 실행하라!!
 document.addEventListener('DOMContentLoaded', function() {
 
-    // 1. 요소 선택
+    // 1. 요소 선택 (리모컨 등록)
+    // 각 태그의 ID를 이용해서 자바스크립트 변수로 가져옴 => 이 변수들을 통해 화면의 글자를 바꾸거나, 스타일 변경이 가능함
     const modal = document.getElementById('myModal');
     const patientListEl = document.getElementById('patientList'); // 왼쪽 패널 (환자 목록)
     const fileListEl = document.getElementById('fileList');       // 오른쪽 패널 (파일 목록)
@@ -689,14 +690,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnClose = document.querySelector('.close-btn');
     const mainFileNameDisplay = document.getElementById('fileName');
 
-    // 서버 데이터 가져오기 (방어 코드)
+    // 서버 데이터 가져오기 (방어 코드) - 에러 막기
+    // jsp에서 넘겨준 데이터 SERVER_PATIENT_LIST가 있으면 사용, 없으면 빈 배열을 사용! 
     const rawData = (typeof SERVER_PATIENT_LIST !== 'undefined') ? SERVER_PATIENT_LIST : [];
 
     // 2. 데이터 가공 함수 (환자별로 그룹핑)
     // 데이터 그룹화 [ 제일 핵심 !! ]
     // 결과 예시: { "홍길동_19900101": [파일1, 파일2], "김철수_19880505": [파일3] }
     function groupPatients(data) {
-        const grouped = {};
+        const grouped = {}; // 빈 객체(바구니) 준비
         data.forEach(p => {
             // 고유 키 생성: 동명이인을 구분하기 위해 '이름+생년월일'을 합쳐서 열쇠로 씀
             // 예: "홍길동:19900101"
@@ -714,8 +716,13 @@ document.addEventListener('DOMContentLoaded', function() {
             // 방이 있으면 파일만 집어넣기
             grouped[key].files.push(p);
         });
-        // 객체 형태를 배열로 변환해서 리턴
+        // 객체(Object) 형태를 배열(Array) 형태로 변환해서 내보냅니다.
         return Object.values(grouped);
+        /*
+        입력: [{홍길동, 뇌사진1}, {홍길동, 뇌사진2}, {김철수, 폐사진1}]
+        출력: [{이름:홍길동, 파일:[뇌사진1, 뇌사진2]}, {이름:김철수, 파일:[폐사진1]}]
+        이처럼 뒤죽박죽 섞인 파일들을 환자별 폴더에 정리해 넣는 작업입니다
+        */
     }
 
     // 그룹화 실행!
@@ -725,53 +732,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 3. [왼쪽] 환자 리스트 그리기 함수
     function renderPatientList(data) {
-        patientListEl.innerHTML = '';
+        patientListEl.innerHTML = ''; // 기존 목록 싹 지우기 (초기화)
 
         if (data.length === 0) {
+            // 검색 결과가 없을 때 안내 문구 표시 및 함수 종료
             patientListEl.innerHTML = '<li style="padding:20px; text-align:center; color:#888;">검색 결과 없음</li>';
             return;
         }
 
         data.forEach(patient => {
+            // <li> 태그 생성
             const li = document.createElement('li');
+            // css 스타일 적용
             li.className = 'patient-item';
+            // 화면에 보여질 HTML 내용 (이름, 생년월일, 파일개수)
             li.innerHTML = `
-                <div style="font-weight:bold; font-size:1.1rem; margin-bottom:4px;">${patient.name}</div>
-                <div style="font-size:0.85rem; color:#aaa;">${patient.birth} (${patient.gender})</div>
-                <div style="font-size:0.8rem; color:#888; margin-top:5px;">MRI 파일: ${patient.files.length}개</div>
+                <div class="p-name-area">
+                    ${patient.name}
+                </div>
+
+                <div class="p-info-area">
+                    <span class="p-meta">${patient.birth} (${patient.gender})</span>
+                    <span class="p-count">MRI ${patient.files.length}건</span>
+                </div>
             `;
 
             // 클릭 시 [오른쪽]에 파일 리스트 띄우기
             li.addEventListener('click', function() {
-                // 1) 모든 리스트에서 active 클래스 제거
+                // 1) 모든 리스트에서 하이라이트(active) 클래스 제거
                 document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('active'));
-                // 2) 현재 클릭한 것만 active 추가
+                // 2) 현재 클릭한 것만 하이라이트(active) 켜기
                 li.classList.add('active');
-                // 3) 오른쪽 패널 갱신 함수 호출
+                /*
+                   3) 오른쪽 패널에 갱신 함수 호출, 이 환자의 파일들을 그려달라고 명령!
+                      왼쪽 목록을 클릭했을 때, 해당 환자의 데이터 꾸러미(patient)를 통째로 넘겨서 오른쪽 화면을 그리게 합니다.
+                      이것이 두 패널을 연결하는 다리 역할을 해줍니다.
+                 */
                 renderFileList(patient);
             });
 
-            patientListEl.appendChild(li);
+            patientListEl.appendChild(li); // 완성된 <li>를 목록(ul)에 붙이기
         });
     }
 
 
     // 4. [오른쪽] MRI 파일 리스트 그리기 함수
     function renderFileList(patient) {
-        // 헤더 업데이트
+        // 1. 오른쪽 헤더 제목 바꾸기 (누구의 리스트인지 표시)
         rightHeader.innerHTML = `
             <span style="color:#4CAF50;">${patient.name}</span> 님의 MRI 리스트
             <span style="font-size:0.8rem; color:#aaa; margin-left:10px;">총 ${patient.files.length}건</span>
         `;
 
-        fileListEl.innerHTML = ''; // 초기화
+        fileListEl.innerHTML = ''; // 기존 파일 목록 초기화
 
-        // 파일 목록 생성
+        // 2. 환자가 가진 파일 개수만큼 반복
         patient.files.forEach(p => {
             const li = document.createElement('li');
             li.className = 'file-item';
 
-            // 확인 여부 UI
+            // 3. 의사가 확인했는지(lastCheck) 여부에 따라 마크 표시
+            // 삼항 연산자: (조건) ? 참일때 : 거짓일때
             const checkHtml = p.lastCheck
                 ? `<span style="font-size:0.8rem; color:#4CAF50; border:1px solid #4CAF50; padding:2px 6px; border-radius:4px;">✔ 확인됨 (${p.lastCheck})</span>`
                 : `<span style="font-size:0.8rem; color:#FF453A;">미확인</span>`;
@@ -784,7 +805,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${checkHtml}
             `;
 
-            // ★ 파일 클릭 시 로딩 (기존 로직 유지)
+            // ★ 클릭 이벤트: 파일을 누르면 로딩 시작!
             li.addEventListener('click', function() {
                 loadFileAndUpload(p); // 아래에 정의된 함수 호출
             });
@@ -796,24 +817,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 5. 실제 파일 로딩 로직 (기존 코드 분리하여 정리)
     function loadFileAndUpload(p) {
+        // 1. 메인 화면의 제목을 파일명으로 변경 (UI 업데이트)
+        // 예: /mri-file/brain_scan_01.nii.gz
         if (mainFileNameDisplay) {
             mainFileNameDisplay.textContent = p.fileName;
             mainFileNameDisplay.style.color = "#4CAF50";
             mainFileNameDisplay.style.fontWeight = "bold";
         }
 
+        // 2. fetch: 자바스크립트가 서버에 몰래 가서 파일을 가져옴 (WebConfig에 설정된 경로)
+        // 요청 주소 만들기 [예: /mri-file/image_123.nii.gz]
         const resourceUrl = `/mri-file/${p.fileName}`;
 
+        // 3. fetch (서버 통신)
         fetch(resourceUrl)
             .then(response => {
-                if (!response.ok) throw new Error(`파일 찾기 실패 (URL: ${resourceUrl})`);
-                return response.blob();
+                if (!response.ok) throw new Error(`파일 찾기 실패 (URL: ${resourceUrl})`); // 파일 없으면 에러
+                return response.blob(); // 파일을 'Blob(덩어리)' 형태로 받음
             })
             .then(blob => {
+                // 4. 가짜 파일 생성
+                // 뷰어는 사용자가 드래그&드롭한 'File 객체'를 원하므로,
+                // 서버에서 받은 데이터를 이용해서 가짜 File 객체를 만들어 줌..
                 const file = new File([blob], p.fileName, {type: "application/octet-stream"});
-                uploadFile(file); // 기존 뷰어 업로드 함수 실행
-                closeModal();     // 성공 시 모달 닫기
+                // 기존 뷰어 업로드 함수 실행
+                uploadFile(file);
+                // 성공 시 모달 닫기
+                closeModal();
             })
+            // 실패시 경고창..
             .catch(err => {
                 console.error("로딩 실패:", err);
                 alert("파일 로딩 실패: " + err.message);
@@ -824,15 +856,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // 6. 검색 기능 (환자 이름으로 검색)
     if (searchInput) {
         searchInput.addEventListener('keyup', function() {
+            // 대소문자 무시 (다 대문자로 바꿔서 비교)
             const keyword = searchInput.value.toUpperCase();
 
-            // 그룹화된 데이터에서 필터링
+            // 전체 환자 데이터(groupedData) 중에서 검색어가 포함된 사람만 남김 (filter)
             const filtered = groupedData.filter(patient => {
+                // 이름이나 생년월일에 검색어가 포함되어 있는지 확인
                 const pName = patient.name ? patient.name.toUpperCase() : '';
                 const pBirth = patient.birth ? patient.birth : '';
                 return pName.includes(keyword) || pBirth.includes(keyword);
             });
 
+            // 걸러낸 데이터로 왼쪽 목록 다시 그리기
             renderPatientList(filtered);
 
             // 검색 시 오른쪽 패널 초기화
@@ -851,7 +886,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // [실행]
-    renderPatientList(groupedData); // 왼쪽 리스트 그리기
+    renderPatientList(groupedData); // 왼쪽 리스트(목록) 그리기
     openModal(); // 페이지 로딩 시 자동 열기
 });
 
