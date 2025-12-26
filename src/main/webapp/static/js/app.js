@@ -315,49 +315,6 @@ function uploadFile(file) {
   });
 }
 
-/**
- * ✅ 세션 생성
- */
-function createSession(fileId, fileName) {
-  sessions.set(fileId, {
-    fileId,
-    fileName,
-    axis: null,
-    sliceCount: 0,
-    currentIndex: 0
-  });
-  renderTabs();
-}
-
-/**
- * ✅ 활성 세션 전환
- */
-function setActiveSession(fileId) {
-  activeSessionId = fileId;
-  renderTabs();
-
-  const s = sessions.get(fileId);
-  if (!s) return;
-
-  show2DView();
-
-  // ✅ 썸네일 기본은 펼친 상태
-  $("#analysis2DView").removeClass("thumbs-collapsed").addClass("thumbs-open");
-  $("#btnThumbToggle").text("▲");
-
-  // ✅ 이미 축/이미지가 로드된 세션이면 복원
-  if (s.axis && s.sliceCount > 0) {
-    const baseUrl = `/api/slices/${s.fileId}/${s.axis}/`;
-    $("#viewerTitle").text(s.axis.toUpperCase() + " View");
-
-    setMainImage(baseUrl, s.currentIndex);
-    renderThumbs(baseUrl, s.sliceCount, s.currentIndex);
-  } else {
-    $("#viewerTitle").text("2D VIEW (Axial / Coronal / Sagittal)");
-    $("#mainSlice").attr("src", "");
-    $("#thumbList").empty();
-  }
-}
 
 /**
  * ✅ 탭 렌더링
@@ -953,59 +910,63 @@ $(document).on('click', '.recent-item', function() {
  * ✅ 서버에 있는 파일 경로로 로드하기 (핵심 엔진)
  * filePath: "/home/test/brain.nii" 같은 서버 절대 경로
  */
+/**
+ /**
+ * ✅ 서버 파일 로드 요청 (수정됨: 문법 오류 해결 및 UI 갱신 완벽 적용)
+ */
 function loadServerFile(filePath) {
-    console.log("서버 파일 로딩 요청 시작:", filePath);
+    console.log(" [1] 서버 파일 로딩 요청 시작:", filePath);
 
-    // 1. 자바(백엔드)에게 요청 (AJAX)
-    // AJAX란 자바(백)와 자바스크립트(프론트)가 비동기적으로 통신하는 기술
-    // 즉, F5를 하지 않고 페이지의 일부부만 서버에서 데이터를 가져와서 업데이틑 하는 기술
-    // 비동기성은 서버에 요청을 보냄 -> 요청이 올 때까지 기다리는게 아닌 다른 작업을 계속 할 수 있음 !!
-    // Ajax 자체는 브라우저(스크립트)의 기술이지만, 자바 서버와 데이터를 주고 받을 때 가장 빛이 남 !_!
     $.ajax({
-        url: `${API_BASE}/load-local`, // Controller의 /load-local 주소 = 컨트롤러에 만든 전용 통로로 신호주기
+        url: `${API_BASE}/load-local`,
         method: "POST",
-        contentType: "application/json", // 데이터가 JSON 형식임을 미리 알려줌. 서버의 @RequestBody와 짝꿍
-        data: JSON.stringify({ filePath: filePath }), // { "filePath": "..." }
-        // 사용자가 선택한 파일이 서버 컴퓨터의 어떤 위치(C:/data/mri_01.dcm 등)에 있는지 경로 정보를 포장해서 보내기
-
-        // 2. 성공 시
+        contentType: "application/json",
+        data: JSON.stringify({ filePath: filePath }),
         success: function (res) {
-            if (!res.ok) { // ok가 아니라면,,
-                alert("파일 로드 실패: " + res.message);
+            if (!res.ok) {
+                alert("로드 실패: " + res.message);
                 return;
             }
-
-            // 서버가 발급해준 ID와 파일명
-            // 서버가 파일을 성공적으로 읽을 경우 해당 파일을 식별할 수 있는 고유 번호(ID)와 원래 이름을 응답으로 보내기
 
             const fileId = res.fileId;
             const fileName = res.originalName;
 
-            console.log(`로딩 성공! ID: ${fileId}`);
+            console.log(` [2] 로딩 성공! ID: ${fileId}`);
 
-            // 3. 뷰어 실행 (기존 로직 재사용)
-            // 뷰어 엔진에 해당 ID를 가진 파일을 이제부터 보여줄 것이다! 라고 세션을 생성 및 저장
+            // 1. 세션 생성
             createSession(fileId, fileName);
-            setActiveSession(fileId); // 여러 파일 중 해당 파일만 메인으로 보겠다고 설정 -> 뷰어 활성화 및 상태 제어
 
-            // 업로드 화면을 닫고 실제 MRI 영상을 볼 수 있는 2D 분석 도구를 화면에 표시.
+            // 2. [중요] 받아온 환자 기록을 세션에 저장
+            const s = sessions.get(fileId);
+            if (s) {
+                s.historyList = res.historyList;
+            }
+
+            // 3. 뷰어 활성화 (여기서 setActiveSession이 호출되면서 오른쪽 리스트도 그려짐)
+            setActiveSession(fileId);
+
             openTools();
             show2DView();
 
-            // UI 정리
+            // 4. 오른쪽 리스트 강제 업데이트 (확실하게 하기 위해)
+            // (setActiveSession에서도 부르지만, 로딩 직후에는 명시적으로 호출하는 게 좋습니다)
+            updateHistoryList(res.historyList, fileName);
+
+            // 5. UI 정리 (모달 닫기, 스타일 초기화)
             $("#layoutRoot").removeClass("upload-mode");
             $("#analysis2DView").removeClass("thumbs-collapsed").addClass("thumbs-open");
-            // 클레스를 제어해서 화면의 레이아웃을 업로드 모드 -> 분석 모드로 전환
             $("#btnThumbToggle").text("▲");
             $("#viewerTitle").text("축(Axis)을 선택해주세요");
 
-            alert("파일이 로드되었습니다. 왼쪽에서 축(Axial 등)을 클릭하세요!");
-        },
+            // 모달 및 드로어 닫기
+            $("#recentDrawer").removeClass("open");
+            $("#recentDrawerOverlay").removeClass("show");
+            $("#diagnosisInput").val(""); // 진단 입력창 초기화
 
-        // 3. 에러 시
+        },
         error: function (xhr) {
             console.error(xhr);
-            alert("서버 연결 에러: " + (xhr.responseText || xhr.statusText));
+            alert("서버 통신 에러: " + (xhr.responseText || xhr.statusText));
         }
     });
 }
@@ -1013,79 +974,7 @@ function loadServerFile(filePath) {
 
 // 최근 분석리스트 오른쪽 사이드바 내용 출력.. 12월 24일 추가..
 
-/**
- * ✅ 서버 파일 로드 요청
- */
-function loadServerFile(filePath) {
-    /*
-        [함수명] loadServerFile
-        [기 능] 서버에 저장된 특정 MRI 파일 (.nii)을 로드하고, 뷰어 및 환자 기록 리스트를 갱신
-        [파라미터] filePath : 로드할 파일의 서버 측 경로 문자열
-     */
-    console.log("서버 파일 로딩 시작:", filePath);
-        // 1. 디버깅용 로그 : 어떤 파일이 요청 되었는지 브라우저 콘솔에 기록합니다.
-    $.ajax({
-        // 2. jQuery AJAX 비동기 통신 시작.
-        url: `${API_BASE}/load-local`,
-        // 요청을 보낼 서버의 URL ( Controller의 @PostMapping("/load-local"))"
-        method: "POST",
-        // HTTP 메서드 방식 (데이터를 보내서 처리를 요청하므로 POST 사용)
-        contentType: "application/json",
-        // 서버로 보낼 데이터의 타입 지정 (JSON 형식임을 명시)
-        // 이 설정이 있어야 자바 Controller의 @RequestBody가 데이터를 제대로 읽습니다.
-        data: JSON.stringify({ filePath: filePath }),
-        // 실제 보낼 데이터 (자바 스크립트 객체를 JSON 문자열로 변환하여 전송)
-        success: function (res) {
-            // 통신 성공 시 실행될 콜백 함수 (res : 서버에서 응답한 Map 데이터)
-            if (!res.ok) {
-                alert("로드 실패: " + res.message); // 서버가 보낸 에러 메세지 출력..
-                return; // 함수 강제 종료
-            }
 
-            // 1. 뷰어 실행
-            // 데이터 추출 서버 응답에서 필요한 데이터 꺼내기
-            const fileId = res.fileId; // 서버가 생성한 세션용 임시 ID
-            const fileName = res.originalName; // 원본 파일명
-
-            createSession(fileId, fileName);
-            // 뷰어 초기화 - 로컬 세션 생성 (브라우저 메모리에 파일 정보 저장)
-            setActiveSession(fileId);
-            // 뷰어 초기화 - 현재 보고 있는 파일을 활성 상태로 설정
-            openTools();
-            // UI 변경 - 왼쪽 도구 패널 (Axis 선택 등)을 엽니다.
-            show2DView();
-            // UI 변경 - 업로드 화면을 숨기고 2D 뷰어 화면을 표시합니다.
-
-            // 2. [★핵심] MRI 기록 리스트 업데이트
-            // 서버에서 받은 리스트(res.historyList)를 넘겨줍니다. (해당 환자의 과거 기록)를 화면에 그리는 함수 호출
-            updateHistoryList(res.historyList, fileName);
-
-            // 3. UI 정리
-            $("#layoutRoot").removeClass("upload-mode");
-            // UI 정리 - 전체 레이아웃에서 업로드 모드 스타일 제거
-            $("#recentDrawer").removeClass("open");
-            // UI 정리 - 최근 분석 기록 사이드바 닫기
-            $("#recentDrawerOverlay").removeClass("show");
-            // UI 정리 - 사이드바 뒤의 어두운 배경(오버레이) 숨기기
-
-            // 4. 진단 코멘트창 초기화
-            $("#diagnosisInput").val("");
-            // 입력창 초기화 - 이전에 작성했던 진단 코멘트가 있다면 비워줌 (새 파일이므로)
-
-            console.log(`로딩 성공! ID: ${fileId}`);
-            // 완료 로그 출력
-
-        },
-        // 4. 통신 실패 시 실행될 콜백 함수 (네트워크 오류, 서버 다운 등)
-        error: function (xhr) {
-
-            console.error(xhr);
-            // 에러 내용을 콘솔에 자세히 출력
-            alert("서버 통신 에러: " + (xhr.responseText || xhr.statusText));
-            // 사용자에게 알림창 띄위기 (statusText가 없으면 responseText 사용)
-        }
-    });
-}
 
 /**
  * ✅ 환자 MRI 기록 리스트 그리기 (info-card 안쪽 채우기)
@@ -1121,7 +1010,7 @@ function updateHistoryList(historyList, currentFileName) {
     // 값이 없을 수도 있으니(null) 'Unknown' 같은 기본값 처리
     const pName = firstItem.patientName || firstItem.PATIENTNAME || "Unknown";
     const pGender = firstItem.gender || firstItem.GENDER || "";
-    $("#targetPatientName").text(` - ${pName} (${pGender})`);
+    $nameSpan.text(` - ${pName} (${pGender})`);
 
     // 리스트 하나씩 HTML 만들기
     // 4. 리스트 순회 : 받아온 목록(Array)을 하나씩 돌면서 HTML을 만듭니다.
@@ -1167,3 +1056,55 @@ function updateHistoryList(historyList, currentFileName) {
         $container.append(html);
     });
 }
+/**
+ * ✅ [수정됨] 세션 생성 (historyList 저장 공간 확보)
+ */
+function createSession(fileId, fileName) {
+    sessions.set(fileId, {
+        fileId,
+        fileName,
+        axis: null,
+        sliceCount: 0,
+        currentIndex: 0,
+        historyList: [] // ★ 여기에 환자 기록을 저장할 겁니다.
+    });
+    renderTabs();
+}
+/**
+ * ✅ [수정됨] 활성 세션 전환 (탭 누를 때마다 환자 정보 갱신)
+ */
+function setActiveSession(fileId) {
+    activeSessionId = fileId;
+    renderTabs();
+
+    const s = sessions.get(fileId);
+    if (!s) return;
+
+    show2DView();
+
+    // 썸네일 펼침 상태 복원
+    $("#analysis2DView").removeClass("thumbs-collapsed").addClass("thumbs-open");
+    $("#btnThumbToggle").text("▲");
+
+    // [★핵심] 탭을 바꿨으니, 아까 저장해둔 기록을 꺼내서 오른쪽 화면을 다시 그림!
+    if (s.historyList && s.historyList.length > 0) {
+        updateHistoryList(s.historyList, s.fileName);
+    } else {
+        // 기록이 없는 파일(단순 업로드 등)이면 비워둠
+        $("#historyList").empty();
+        $("#targetPatientName").text("");
+    }
+
+    // 기존 이미지 복원
+    if (s.axis && s.sliceCount > 0) {
+        const baseUrl = `/api/slices/${s.fileId}/${s.axis}/`;
+        $("#viewerTitle").text(s.axis.toUpperCase() + " View");
+        setMainImage(baseUrl, s.currentIndex);
+        renderThumbs(baseUrl, s.sliceCount, s.currentIndex);
+    } else {
+        $("#viewerTitle").text("2D VIEW (Axial / Coronal / Sagittal)");
+        $("#mainSlice").attr("src", "");
+        $("#thumbList").empty();
+    }
+}
+
