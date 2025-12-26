@@ -3,6 +3,22 @@
 ✅ save_slice_2d.py
 - NIfTI 파일(.nii)을 읽어서 지정된 축(Axis) 방향으로 2D PNG 이미지들을 저장합니다.
 - 4D 데이터일 경우 '3번 채널'을 우선적으로 사용합니다.
+
+argparse로 input/out/axis 받기
+↓
+input 파일 존재 확인
+↓
+nibabel로 NII 로드 → numpy 배열 얻기
+↓
+4D면 channel 3(없으면 0) 선택해서 3D로 만들기
+↓
+axis에 따라 2D 슬라이스 리스트 만들기
+↓
+각 슬라이스를 0~255로 정규화
+↓
+slice_000.png 형태로 out 폴더에 저장
+↓
+마지막에 {"ok":true,"sliceCount":...} JSON을 print
 """
 
 import argparse
@@ -14,24 +30,29 @@ from PIL import Image
 
 def pick_volume(data: np.ndarray) -> np.ndarray:
     """
-    3D 또는 4D 데이터에서 작업할 3D 볼륨을 추출합니다.
-    4D인 경우 3번 채널(index 3)을 가져옵니다.
+    data: np.ndarray
+    → “data는 numpy 배열일 거야(라고 힌트 주는 것)”
+    -> np.ndarray
+    → “이 함수는 numpy 배열을 반환할 거야”
     """
+    # data.nmim = numpy 배열의 차원 수
     if data.ndim == 3:
         return data
 
     if data.ndim == 4:
-        # 🔥 사용자 요청: 채널 3번 고정
+        # 🔥 target_modality = 3 --> 3번채널을 쓰겠다 (0부터 시작)
         target_modality = 3
 
         # 만약 데이터가 3번 채널까지 없다면? (에러 방지용)
+        # data.shape[3] 배열의 각 차원 크기 정보
         if data.shape[3] <= target_modality:
             # 3번이 없으면 0번(기본)을 씁니다. (혹은 에러를 내려면 아래 주석 해제)
-            # raise ValueError(f"Channel {target_modality} not found. Max is {data.shape[3]-1}")
+            # 슬라이싱 문법 : 는 전체를 의미 0은 채널 0번만 가져와라
             return data[:, :, :, 0]
 
         return data[:, :, :, target_modality]
-
+    # rasie란? 예외를 일부러 발생시켜 중단
+    # f-string 문법
     raise ValueError(f"Unsupported NIfTI dimension: {data.ndim}")
 
 def normalize_slice(sl: np.ndarray) -> np.ndarray:
