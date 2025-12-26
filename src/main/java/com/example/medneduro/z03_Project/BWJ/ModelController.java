@@ -294,6 +294,7 @@ public class ModelController {
         // Path : 주소를 나타내는 객체
         // Paths.get(문자열) : 글자로 된 주소를 자바가 이해하는 네비게이션 주소로 바꿔주는 기능입니다.
         // 단순 글자(String)일 때는 기능이 없음, Path 전환하면 복사, 이동, 삭제 명령어 가능..
+
     if (!source.isAbsolute()){
         source = Paths.get(uploadDir, filePath);
     }
@@ -322,6 +323,15 @@ public class ModelController {
      */
     String originalName = source.getFileName().toString(); // 여긴 왜 .replace를 사용하지 않는가..? 실제 이름이라서?
     String ext = originalName.toLowerCase().endsWith(".nii.gz") ? ".nii.gz" : ".nii";
+
+    String displayName = originalName;
+
+    if (originalName.length() > 33 && originalName.contains("_")){
+        // "UUID_진짜이름" 형태라고 가정하고 뒷부분만 남김
+        // 예: "6eaede3dcc92425989a236a9db7e9b9f_Brain.nii" -> "Brain.nii"
+        displayName = originalName.substring(33);
+    }
+
     /*
         파일이 .nii 인지 .nii.gz (압축파일)인지 확인해서, 복사본에도 똑같은 꼬리표를 붙여줘야 합니다.
         originalName = 원본 파일의 이름을 가져옵니다.

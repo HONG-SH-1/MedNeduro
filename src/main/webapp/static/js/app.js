@@ -996,8 +996,12 @@ function updateHistoryList(historyList, currentFileName) {
     const $container = $("#historyList"); // HTML에서 만든 그 공간
     // 1. DOM 요소 선택 : 리스트를 집어넣을 HTML 컨테이너 (div)를 가져옴
 
+    // 환자명/성별 들어간 span태그 선택
+    const $nameSpan = $("#targetPatientName");
+
     $container.empty(); // 기존 내용(안내문구 등) 지우기
     // 2. 초기화 : 기존에 표시되어 있던 리스트나 안내 문구를 싹 지웁니다.
+    $nameSpan.text("");
 
     // 기록이 없을 때
     // 3. 예외 처리 : 만약 리스트가 없거나 비어있다면? (무결성 검사)
@@ -1006,6 +1010,15 @@ function updateHistoryList(historyList, currentFileName) {
         $container.html('<div style="font-size:0.8rem; color:#888; text-align:center; margin-top:20px;">기록 없음</div>');
         return;
     }
+    // 리스트의 0번째 (첫 번째) 데이터를 꺼냅니다.
+    const firstItem = historyList[0];
+
+    // 이름과 성별을 꺼냅니다. 데이터가 없을 경우를 대비해서 || 처리
+    const pNameHeader = firstItem.patientName || firstItem.PATIENTNAME || "이름미상";
+    const pGenderHeader = firstItem.gender || firstItem.GENDER || "";
+
+    // HTML의 span 태그에 글자를 넣습니다.
+    $nameSpan.text(`- ${pNameHeader} (${pGenderHeader})`);
 
     // 리스트 하나씩 HTML 만들기
     // 4. 리스트 순회 : 받아온 목록(Array)을 하나씩 돌면서 HTML을 만듭니다.
@@ -1025,8 +1038,8 @@ function updateHistoryList(historyList, currentFileName) {
         const date = item.uploadDt || item.UPLOADDT || item.UPLOAD_DT;
         // [★추가] SQL에서 새로 가져온 환자 이름과 성별 꺼내기
         // 값이 없을 수도 있으니(null) 'Unknown' 같은 기본값 처리
-        const pName = item.patientName || item.PATIENTNAME || "이름미상";
-        const gender = item.gender || item.GENDER || "";
+
+
 
         // 조건부 스타일링 - 현재 보고 있는 파일인지 확인
         // 만약 리스트의 파일명(name)이 현재 파일명(currentFileName)과 같다면?
