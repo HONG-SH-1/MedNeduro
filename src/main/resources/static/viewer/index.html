@@ -59,7 +59,6 @@
     <!-- ✅ 상단바: 브랜드 + 최근 분석만 -->
     <header class="topbar">
         <div class="brand">MedNeuro</div>
-        <button id="btnRecent" class="btn">최근 분석 보기</button>
     </header>
 
     <!-- ✅ 레이아웃 루트 -->
@@ -76,10 +75,10 @@
         <!-- 2025-12-23  아이콘 추가-->
         <!-- ✅ 왼쪽 얇은 바 -->
         <aside class="iconbar">
+            <button id="btnUpload" ><span class="material-symbols-outlined">upload</span>Upload</button>
             <button id="2dBtn"><span class="material-symbols-outlined">replace_image</span>2D</button>
             <button id="3dBtn"><span class="material-symbols-outlined">deployed_code</span>3D</button>
-            <button id="commentBtn"><span class="material-symbols-outlined">edit_square</span></button>
-
+            <button id="logOutBtn" ><span class="material-symbols-outlined">Logout</span></button>
         </aside>
 
         <!-- ✅ 축 버튼 패널 -->
@@ -142,9 +141,9 @@
             <!-- (화면 3) 3D -->
             <section id="view3D" class="panel hidden">
                 <div class="viewer-header">
-                    <div class="viewer-title">3D View</div>
+                    <div class="viewer-title">3D 화면</div>
                     <div class="viewer-actions">
-                        <button id="btnBackTo2D" class="btn">2D Conversion</button>
+                        <button id="btnBackTo2D" class="btn">2D 변환</button>
                     </div>
                 </div>
 
@@ -154,7 +153,7 @@
             </section>
         </main>
 
-        <!-- ✅ 우측 정보/버튼 -->
+        <!-- ✅ 우측 정보/버튼
         <aside class="rightbar">
             <div class="info-card">Patient Info</div>
             <div class="info-card">Surgical Info</div>
@@ -166,6 +165,7 @@
                 <button id="btnAnalyze" class="btn big">Analyze</button>
             </div>
         </aside>
+ -->
 
         <!-- ✅ 접기/펼치기 핸들 -->
         <button id="btnToolToggle" class="tool-handle hidden" type="button">◀</button>

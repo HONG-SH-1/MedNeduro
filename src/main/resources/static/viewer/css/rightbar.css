@@ -13,7 +13,7 @@
     gap:10px;
 }
 .info-card{
-    height:120px;
+    height:200px;
     border-radius:12px;
     border:1px solid var(--line);
     background:rgba(0,0,0,0.12);
@@ -53,4 +53,7 @@
 /* 접었을 때 */
 .layout.tools-collapsed .tool-handle{
     left: calc(var(--iconbar-w) - (var(--handle-w) / 2) + 12px);
+}
+.info-card div::-webkit-scrollbar{
+    display:none;
 }

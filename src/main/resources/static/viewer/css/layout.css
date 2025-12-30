@@ -146,12 +146,12 @@
 
 /* ✅ 펼친 상태 */
 .layout.tools-open{
-    grid-template-columns: var(--iconbar-w) var(--toolpanel-w) 1fr var(--rightbar-w);
+    grid-template-columns: var(--iconbar-w) var(--toolpanel-w) 1fr;
 }
 
 /* ✅ 접은 상태 */
 .layout.tools-collapsed{
-    grid-template-columns: var(--iconbar-w) 0px 1fr var(--rightbar-w);
+    grid-template-columns: var(--iconbar-w) 0px 1fr;
 }
 
 /* ✅ (수정 1) layoutRoot 1행: 탭바 */
@@ -171,7 +171,6 @@
     grid-template-columns:
     var(--iconbar-w)
     1fr
-    220px
 }
 
 /* ✅ 2행에 배치될 요소들 */
@@ -300,4 +299,8 @@
     flex-direction:column;
     gap:12px;
     min-height: 0;
+}
+#logOutBtn {
+    margin-top: auto;    /* 위쪽 여백을 자동으로 최대치로 설정 -> 아래로 밀림 */
+    margin-bottom: 10px; /* 바닥이랑 너무 딱 붙지 않게 약간 띄워줌 (선택사항) */
 }
