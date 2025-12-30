@@ -16,19 +16,19 @@ public class LoginInterceptor implements HandlerInterceptor{
     스프링이 제공하는 인터셉터 인터페이스(규격) 구현하기
     스프링 MVC의 정해진 흐름(컨트롤러 호출 전/후 등)에 직접 만든 로직을 끼워넣기 위함..
 
-  preHandle
-  - 시점: 사용장 요청이 컨트롤러에 도착하기 직전에 실행
+     preHandle
+      - 시점: 사용장 요청이 컨트롤러에 도착하기 직전에 실행
 
-  HttpServletRequest request
-  - 출처: 톰캣(WAS)이 생성해서 넘겨줌
-  - 기능: 사용자가 보낸 요청 정보(세션, 파라미터, 쿠기 등) 모두 담고 있는 바구니!
+     HttpServletRequest request
+     - 출처: 톰캣(WAS)이 생성해서 넘겨줌
+      - 기능: 사용자가 보낸 요청 정보(세션, 파라미터, 쿠기 등) 모두 담고 있는 바구니!
 
-  HttpServletResponse response
-  - 출처: 톰캣(WAS)이 생성해서 넘겨줌
-  - 기능: 서버가 사용자에게 보낼 응답 정보(리다이렉트, 결과 데이터 등)를 제어하는 도구!
+     HttpServletResponse response
+     - 출처: 톰캣(WAS)이 생성해서 넘겨줌
+     - 기능: 서버가 사용자에게 보낼 응답 정보(리다이렉트, 결과 데이터 등)를 제어하는 도구!
 
-  Object handler
-  - 기능: 현재 요청을 처리할 대상(컨트롤러의 어떤 메서드인지)에 대한 정보를 담고 있음
+     Object handler
+     - 기능: 현재 요청을 처리할 대상(컨트롤러의 어떤 메서드인지)에 대한 정보를 담고 있음
   */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
