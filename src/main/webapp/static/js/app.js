@@ -1162,6 +1162,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnClose) btnClose.addEventListener('click', closeModal);
     if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
+    const btnSelect = document.getElementById('selectBtn');
+    if (btnSelect) {
+        btnSelect.addEventListener('click', function() {
+            openModal(); // 모달 열기 함수 실행
+        });
+    }
 
     // [실행]
     renderPatientList(groupedData); // 왼쪽 리스트(목록) 그리기
