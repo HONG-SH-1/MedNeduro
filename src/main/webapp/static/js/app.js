@@ -42,12 +42,60 @@ function getPrettyName(name, patientName, index, totalCount) {
  */
 const sessions = new Map(); // fileId -> session
 let activeSessionId = null;
-
+let image = document.getElementById("mainSlice");
+let stage = null;
 let three = { scene:null, camera:null, renderer:null, controls:null, obj:null };
 
 $(document).ready(function () {
     checkHealth();
     setupDragDrop();
+    initDomRef();
+    initCommentEvents();
+
+
+    image.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+
+        // 실제 화면에 그려진 이미지 위치
+        const rect = image.getBoundingClientRect();
+
+        // 이미지 내부 좌표 (픽셀)
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // 이미지 밖 클릭 방지 (중요)
+        if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+            return;
+        }
+
+        // 정규화 좌표 (DB 저장용)
+        const xRatio = x / rect.width;
+        const yRatio = y / rect.height;
+
+        addMarker(xRatio, yRatio);
+    });
+
+
+
+    $("#2dBtn").on("click", function () {
+        $("#view3D").addClass("hidden");
+        $("#analysis2DView").removeClass("hidden");
+    })
+
+    // 2025-12-23 버튼이벤트 3개 추가
+    $("#3dBtn").on("click", function () {
+        const sid = activeSessionId;
+        if (!sid) {
+            alert("파일이 업로드 되지 않았습니다");
+            return;
+        }
+        make3D(sid);
+    })
+
+    // 2025-12-23 버튼이벤트 3개 추가
+    $("#commentBtn").on("click", function () {
+
+    })
 
     // ✅ 업로드 버튼 (우측)
     $("#btnUpload").on("click", function () {
@@ -197,6 +245,76 @@ function toggleThumbBar() {
         $("#btnThumbToggle").text("▼"); // ▼ = 펼치기(아래로)
     }
 }
+
+function initCommentEvents() {
+    stage.addEventListener("click", function (e) {
+        const marker = e.target.closest(".marker");
+        if (!marker) return;
+
+        openCommentModal(marker);
+    });
+}
+
+function addMarker(xRatio, yRatio) {
+    const imgRect = image.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+
+    // 현재 화면 기준 픽셀 좌표
+    const x = imgRect.left - stageRect.left + (xRatio * imgRect.width);
+    const y = imgRect.top - stageRect.top + (yRatio * imgRect.height);
+
+    const marker = document.createElement("img");
+    marker.src = "../comment.png";
+    marker.src = "/static/comment.png";
+    marker.className = "marker";
+
+    marker.style.left = `${x}px`;
+    marker.style.top = `${y}px`;
+    marker.dataset.comment = "";
+
+    stage.appendChild(marker);
+}
+
+function initDomRef() {
+    stage = document.querySelector(".image-stage");
+}
+
+
+function openCommentModal(marker) {
+    const overlay = document.createElement("div");
+    overlay.className = "comment-modal-overlay";
+
+    overlay.innerHTML = `
+    <div class="comment-modal">
+      <h3>Comment</h3>
+      <textarea placeholder="진단/코멘트 입력...">${marker.dataset.comment || ""}</textarea>
+
+      <div class="actions">
+        <button class="btn-delete">Delete</button>
+      </div>
+    </div>
+  `;
+
+    document.body.appendChild(overlay);
+
+    const textarea = overlay.querySelector("textarea");
+
+
+    // 삭제
+    overlay.querySelector(".btn-delete").onclick = () => {
+        marker.remove();
+        overlay.remove();
+    };
+
+
+    // 배경 클릭 시 닫기
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) overlay.remove();
+        marker.dataset.comment = textarea.value;
+    });
+}
+
+
 
 /**
  * ✅ 서버 상태 체크
