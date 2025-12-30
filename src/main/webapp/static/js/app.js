@@ -19,12 +19,31 @@ const API_BASE = `/api`;
  * @param {boolean} isDescending - true: 역순(3,2,1 - 최근리스트용), false: 정순(1,2,3 - 모달용)
  */
 function getPrettyName(name, patientName, index, totalCount, isDescending = false) {
+    /*
+        name : 서버에 저장된 원래 파일 이름 UUID 로 설정된 난수
+        patient : 환자 이름 (예 : 홍길동)
+        index : 현재 파일이 리스트에서 몇 번째인지 (0부터 시작 : 0,1,2...)
+        totalCount : 이 환자의 파일이 총 몇 개인지
+        isDescending = false :
+            이게 True면 : 번호를 거꾸로 매깁니다 (예 : 3,2,1) 주로 최근 분석 리스트 전용
+            이게 false (기본값)면 : 번호를 순서대로 매깁니다 (예 : 1,2,3). 주로 전체 목록(모달) 용입니다.
+     */
+
     // 1. 안전장치 (이름이 없으면 Unknown)
     const pName = patientName || "Unknown";
+    /*
+       에러 방지용입니다
+       환자의 이름이 값이 있으면 patientName을 넣고, 값이 없으면 Unknown 이라는 텍스트를 입력합니다.
+     */
 
     // 2. 확장자 찾기
     const lower = name.toLowerCase();
     const ext = lower.endsWith(".nii.gz") ? ".nii.gz" : ".nii";
+    /*
+        name.toLowerCase() : 파일 이름을 전부 소문자로 바꿉니다 대소문자 상관없이 확장자를 확인하기 위해서입니다.
+        lower.endsWith(".nii.gz") : 파일 끝이 .nii.gz로 끝나는지 검사합니다.
+        MRI 파일은 .nii 일 수도 있고 압축된 .nii.gz 일 수도 있어서, 원래 확장자를 정확히 살려 주기 위함입니다.
+     */
 
     // 3. 번호 매기기 (역순: 최신 파일이 높은 번호)
     // 예: 총 3개일 때 -> 0번(최신) = 3, 1번 = 2, 2번 = 1
@@ -39,9 +58,22 @@ function getPrettyName(name, patientName, index, totalCount, isDescending = fals
         seqNum = index + 1;
     }
     const seqStr = String(seqNum).padStart(3, "0"); // 1 -> "001"
+    /*
+        .padStart(3,"0") : 글자 수가 3자리가 안 되면, 앞쪽(Start)을 0으로 채우라는 뜻입니다.
+        1 -> 001
+        15 -> 015
+        123 -> 123 (이미 3자리라 그대로)
+        이유 : 파일 이름들이 _1, _10처럼 들쑥날쑥하지 않고 _001, _010 처럼 줄을 딱 맞추게 하기 위해서입니다.
+     */
 
     // 4. 합치기
     return `${pName}_${seqStr}${ext}`;
+
+    /*
+        구한 변수들을 _로 연결해서 최종 결과를 내보냅니다.
+        요약 : 원본 파일명은 무시하고, 환자 이름과 순서 번호만 가지고 새롭고 깔끔한 이름을 지어주는 작명소
+        리스트의 성격(최신순/과거순)에 맞춰 번호를 센스 있게 붙여주는 똑똑하는 기능입니다.
+     */
 }
 
 
