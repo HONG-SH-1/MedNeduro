@@ -55,7 +55,7 @@
         <aside class="iconbar">
             <button id="2dBtn"><span class="material-symbols-outlined">replace_image</span>2D</button>
             <button id="3dBtn"><span class="material-symbols-outlined">deployed_code</span>3D</button>
-            <button id="commentBtn"><span class="material-symbols-outlined">edit_square</span></button>
+            <button id="selectBtn" ><span class="material-symbols-outlined">person_search</span>검색</button>
             <button id="logOutBtn" ><span class="material-symbols-outlined">Logout</span></button>
         </aside>
 
