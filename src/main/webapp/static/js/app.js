@@ -799,6 +799,7 @@ function setActiveSession(fileId) {
     renderTabs();
 
     const s = sessions.get(fileId);
+    console.log("활성화 세션 medmriid", s.medMriId);
     if (!s) return;
 
     show2DView();
@@ -1440,6 +1441,7 @@ function loadServerFile(filePath) {
 
             const fileId = res.fileId;
             const fileName = res.originalName; // 이건 화면 표시용 이름
+
 
             // [3] 세션 생성
             createSession(fileId, fileName);

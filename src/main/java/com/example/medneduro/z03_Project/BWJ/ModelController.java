@@ -446,7 +446,7 @@ public class ModelController {
 
 
      */
-        // 환자 정보 매칭 (예쁜 이름)
+        // 환자 정보 매칭
         // DB에서 이 파일 경로와 관련된 히스토리를 가져오기
         List<Map<String, String>> historyList = serviceLogin.getHistoryList(filePath);
         // 기본값 설정하기 (DB에 없을 경우..)
